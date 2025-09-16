@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriBits API Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: #2563eb; color: white; padding: 40px 0; text-align: center; margin-bottom: 40px; }
+        .nav { background: white; border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 20px; }
+        .nav a { color: #2563eb; text-decoration: none; font-weight: 500; }
+        .nav a:hover { text-decoration: underline; }
+        .section { background: white; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .endpoint { background: #f8f9fa; border-left: 4px solid #2563eb; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .method { display: inline-block; padding: 4px 8px; border-radius: 4px; color: white; font-weight: bold; font-size: 12px; margin-right: 10px; }
+        .method.get { background: #10b981; }
+        .method.post { background: #3b82f6; }
+        .method.put { background: #f59e0b; }
+        .method.delete { background: #ef4444; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Monaco', 'Menlo', monospace; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 15px 0; }
+        pre code { background: none; padding: 0; color: inherit; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .badge.required { background: #fef2f2; color: #dc2626; }
+        .badge.optional { background: #f0f9ff; color: #2563eb; }
+        .response-codes { margin: 20px 0; }
+        .response-codes table { width: 100%; border-collapse: collapse; }
+        .response-codes th, .response-codes td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .response-codes th { background: #f9fafb; font-weight: 600; }
+        h1, h2, h3 { margin-bottom: 15px; }
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 1.75rem; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        h3 { font-size: 1.25rem; color: #374151; }
+        .auth-note { background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 6px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>VeriBits API Documentation</h1>
+            <p>Enterprise-grade trust verification for files, emails, and transactions</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <nav class="nav">
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#verification">Verification</a></li>
+                <li><a href="#webhooks">Webhooks</a></li>
+                <li><a href="#badges">Badges</a></li>
+                <li><a href="#rate-limits">Rate Limits</a></li>
+                <li><a href="#errors">Errors</a></li>
+            </ul>
+        </nav>
+
+        <section id="overview" class="section">
+            <h2>Overview</h2>
+            <p>The VeriBits API provides programmatic access to our trust verification platform. You can verify file hashes, email addresses, and blockchain transactions with enterprise-grade security and real-time threat intelligence.</p>
+
+            <h3>Base URL</h3>
+            <code>https://api.veribits.com/api/v1</code>
+
+            <h3>Content Type</h3>
+            <p>All requests must use <code>Content-Type: application/json</code></p>
+
+            <h3>Response Format</h3>
+            <p>All responses return JSON with a consistent structure:</p>
+            <pre><code>{
+  "success": true,
+  "message": "Success",
+  "data": { ... },
+  "timestamp": "2024-01-15T10:30:00Z"
+}</code></pre>
+        </section>
+
+        <section id="authentication" class="section">
+            <h2>Authentication</h2>
+            <p>VeriBits API uses JWT (JSON Web Tokens) for authentication. Include your token in the Authorization header:</p>
+            <pre><code>Authorization: Bearer your_jwt_token_here</code></pre>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/auth/register</h3>
+                <p>Create a new user account</p>
+                <h4>Request Body</h4>
+                <pre><code>{
+  "email": "user@example.com",
+  "password": "strongpassword123"
+}</code></pre>
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user@example.com",
+    "api_key": "vb_1234567890abcdef..."
+  }
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/auth/login</h3>
+                <p>Authenticate and receive a JWT token</p>
+                <h4>Request Body</h4>
+                <pre><code>{
+  "email": "user@example.com",
+  "password": "strongpassword123"
+}</code></pre>
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "token_type": "bearer",
+    "expires_in": 3600,
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "email": "user@example.com"
+    }
+  }
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/auth/logout</h3>
+                <p>Invalidate the current JWT token</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span>/auth/profile</h3>
+                <p>Get current user profile and quota information</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+            </div>
+        </section>
+
+        <section id="verification" class="section">
+            <h2>Verification Endpoints</h2>
+            <p>All verification endpoints require authentication and consume from your monthly quota.</p>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/verify/file</h3>
+                <p>Verify a file using its SHA256 hash</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+
+                <h4>Request Body</h4>
+                <pre><code>{
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}</code></pre>
+
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "type": "file",
+    "sha256": "e3b0c44...",
+    "veribit_score": 85,
+    "confidence": "high",
+    "risk_level": "low",
+    "factors": [
+      "High entropy (good randomness)",
+      "Clean on VirusTotal",
+      "Well-established hash"
+    ],
+    "threats": [],
+    "metadata": {
+      "entropy": 7.8,
+      "age_score": 15,
+      "algorithm": "VeriBits FileScanner v2.1"
+    },
+    "badge_url": "/api/v1/badge/e3b0c44...",
+    "verified_at": "2024-01-15T10:30:00Z"
+  }
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/verify/email</h3>
+                <p>Verify an email address for format, reputation, and disposable detection</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+
+                <h4>Request Body</h4>
+                <pre><code>{
+  "email": "user@example.com"
+}</code></pre>
+
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "type": "email",
+    "email": "user@example.com",
+    "veribit_score": 78,
+    "confidence": "high",
+    "risk_level": "low",
+    "factors": [
+      "Valid MX record",
+      "Reputable email provider",
+      "Good local part length"
+    ],
+    "threats": [],
+    "metadata": {
+      "format_valid": true,
+      "domain": "example.com",
+      "local_part_length": 4,
+      "algorithm": "VeriBits EmailValidator v2.1"
+    },
+    "badge_url": "/api/v1/badge/5d41402abc4b2a76b9719d911017c592",
+    "verified_at": "2024-01-15T10:30:00Z"
+  }
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/verify/tx</h3>
+                <p>Verify a blockchain transaction</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+
+                <h4>Request Body</h4>
+                <pre><code>{
+  "tx": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "network": "bitcoin"
+}</code></pre>
+
+                <h4>Supported Networks</h4>
+                <ul>
+                    <li><code>bitcoin</code> - Bitcoin network</li>
+                    <li><code>ethereum</code> - Ethereum network</li>
+                    <li><code>litecoin</code> - Litecoin network</li>
+                </ul>
+
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "type": "transaction",
+    "tx": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "network": "bitcoin",
+    "veribit_score": 92,
+    "confidence": "high",
+    "risk_level": "low",
+    "factors": [
+      "Transaction confirmed on blockchain",
+      "Well-aged transaction"
+    ],
+    "threats": [],
+    "metadata": {
+      "network": "bitcoin",
+      "blockchain_data": {
+        "confirmed": true,
+        "value": 5000,
+        "age_hours": 168,
+        "block_height": 780123
+      },
+      "algorithm": "VeriBits TxAnalyzer v2.1"
+    },
+    "badge_url": "/api/v1/badge/1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "verified_at": "2024-01-15T10:30:00Z"
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="webhooks" class="section">
+            <h2>Webhooks</h2>
+            <p>Webhooks allow you to receive real-time notifications about verification events.</p>
+
+            <div class="endpoint">
+                <h3><span class="method post">POST</span>/webhooks</h3>
+                <p>Register a new webhook endpoint</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+
+                <h4>Request Body</h4>
+                <pre><code>{
+  "url": "https://your-app.com/webhooks/veribits",
+  "events": ["verification.completed", "quota.warning"]
+}</code></pre>
+
+                <h4>Available Events</h4>
+                <ul>
+                    <li><code>*</code> - All events</li>
+                    <li><code>verification.completed</code> - When a verification is completed</li>
+                    <li><code>quota.warning</code> - When quota usage reaches 80%</li>
+                    <li><code>quota.exceeded</code> - When quota is fully used</li>
+                </ul>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span>/webhooks</h3>
+                <p>List all registered webhooks</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method put">PUT</span>/webhooks/{id}</h3>
+                <p>Update a webhook configuration</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method delete">DELETE</span>/webhooks/{id}</h3>
+                <p>Delete a webhook</p>
+                <div class="auth-note">🔒 Requires authentication</div>
+            </div>
+
+            <h3>Webhook Payload Example</h3>
+            <pre><code>{
+  "event": "verification.completed",
+  "data": {
+    "verification_id": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "file",
+    "veribit_score": 85,
+    "risk_level": "low",
+    "user_id": "123e4567-e89b-12d3-a456-426614174000"
+  },
+  "timestamp": "2024-01-15T10:30:00Z",
+  "webhook_id": "webhook_123"
+}</code></pre>
+
+            <h3>Webhook Signature Verification</h3>
+            <p>All webhook payloads are signed with HMAC-SHA256. Verify the signature using the <code>X-VeriBits-Signature</code> header:</p>
+            <pre><code>X-VeriBits-Signature: sha256=calculated_signature</code></pre>
+        </section>
+
+        <section id="badges" class="section">
+            <h2>Trust Badges</h2>
+            <p>Trust badges provide visual verification status that can be embedded in websites or applications.</p>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span>/badge/{id}</h3>
+                <p>Get verification badge data</p>
+                <p><strong>No authentication required</strong></p>
+
+                <h4>Response</h4>
+                <pre><code>{
+  "success": true,
+  "data": {
+    "id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "veribit_score": 85,
+    "confidence": "high",
+    "verified_at": "2024-01-15T10:30:00Z"
+  }
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span>/lookup</h3>
+                <p>Quick lookup for verification scores</p>
+                <p><strong>No authentication required</strong></p>
+
+                <h4>Query Parameters</h4>
+                <ul>
+                    <li><code>q</code> <span class="badge required">required</span> - Query string to lookup</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="rate-limits" class="section">
+            <h2>Rate Limits</h2>
+            <p>API endpoints are subject to rate limiting to ensure fair usage:</p>
+
+            <div class="response-codes">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Endpoint Type</th>
+                            <th>Rate Limit</th>
+                            <th>Window</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>30 requests</td>
+                            <td>1 minute</td>
+                        </tr>
+                        <tr>
+                            <td>Verification</td>
+                            <td>Monthly quota based on plan</td>
+                            <td>Per month</td>
+                        </tr>
+                        <tr>
+                            <td>General API</td>
+                            <td>100 requests</td>
+                            <td>1 minute</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Rate Limit Headers</h3>
+            <pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1642248000</code></pre>
+        </section>
+
+        <section id="errors" class="section">
+            <h2>Error Handling</h2>
+            <p>The API uses conventional HTTP response codes and returns error details in JSON format:</p>
+
+            <div class="response-codes">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status Code</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>200</td>
+                            <td>OK - Request successful</td>
+                        </tr>
+                        <tr>
+                            <td>400</td>
+                            <td>Bad Request - Invalid request data</td>
+                        </tr>
+                        <tr>
+                            <td>401</td>
+                            <td>Unauthorized - Invalid or missing authentication</td>
+                        </tr>
+                        <tr>
+                            <td>403</td>
+                            <td>Forbidden - Insufficient permissions</td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>Not Found - Resource doesn't exist</td>
+                        </tr>
+                        <tr>
+                            <td>422</td>
+                            <td>Unprocessable Entity - Validation errors</td>
+                        </tr>
+                        <tr>
+                            <td>429</td>
+                            <td>Too Many Requests - Rate limit exceeded</td>
+                        </tr>
+                        <tr>
+                            <td>500</td>
+                            <td>Internal Server Error - Server error</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Error Response Format</h3>
+            <pre><code>{
+  "success": false,
+  "error": {
+    "message": "Validation failed",
+    "code": 422,
+    "validation_errors": {
+      "email": ["The email field is required"]
+    }
+  },
+  "timestamp": "2024-01-15T10:30:00Z"
+}</code></pre>
+
+            <h3>Common Error Codes</h3>
+            <ul>
+                <li><code>INVALID_TOKEN</code> - JWT token is invalid or expired</li>
+                <li><code>QUOTA_EXCEEDED</code> - Monthly verification quota exceeded</li>
+                <li><code>RATE_LIMIT_EXCEEDED</code> - Too many requests in time window</li>
+                <li><code>VALIDATION_FAILED</code> - Request data validation failed</li>
+                <li><code>RESOURCE_NOT_FOUND</code> - Requested resource doesn't exist</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Need Help?</h2>
+            <p>If you have questions about the VeriBits API, please contact our support team:</p>
+            <ul>
+                <li>Email: <a href="mailto:support@veribits.com">support@veribits.com</a></li>
+                <li>Documentation: <a href="https://docs.veribits.com">docs.veribits.com</a></li>
+                <li>Status Page: <a href="https://status.veribits.com">status.veribits.com</a></li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

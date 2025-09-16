@@ -1,14 +1,35 @@
+'use client'
+
+import { useState } from 'react'
+import AuthProvider, { useAuth } from './components/AuthProvider'
+import Navbar from './components/Navbar'
+import Dashboard from './components/Dashboard'
+import LandingPage from './components/LandingPage'
+
 export default function Home() {
   return (
-    <main style={{padding:24,lineHeight:1.6}}>
-      <h1 style={{fontSize:'2rem'}}>VeriBits Dashboard</h1>
-      <p>Verify files, emails, and transactions. High-contrast and keyboard-friendly.</p>
-      <ol>
-        <li>Paste an email or file hash</li>
-        <li>Get a VeriBit score</li>
-        <li>Share a badge or trigger a webhook</li>
-      </ol>
-      <p style={{opacity:.7}}>© {new Date().getFullYear()} After Dark Systems</p>
-    </main>
+    <AuthProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <main>
+          <AuthenticatedContent />
+        </main>
+      </div>
+    </AuthProvider>
   )
 }
+
+function AuthenticatedContent() {
+  const { isAuthenticated, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
+
+  return isAuthenticated ? <Dashboard /> : <LandingPage />
+}
+
