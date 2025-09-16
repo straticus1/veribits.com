@@ -1,0 +1,7 @@
+---
+- name: VeriBits convenience tasks
+  hosts: local
+  tasks:
+    - name: Show Terraform outputs
+      command: terraform output -json
+      args: { chdir: infrastructure/terraform }
