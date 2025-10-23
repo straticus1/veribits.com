@@ -10,15 +10,28 @@ variable "jwt_secret" {
   sensitive   = true
 }
 
-variable "db_username" {
+# Existing After Dark Systems Database Configuration
+variable "existing_db_identifier" {
   type        = string
-  default     = "veribits"
-  description = "Database username"
+  description = "Identifier of the existing After Dark Systems RDS database instance"
+  default     = "afterdarksys-main-db"
 }
 
-variable "db_password" {
+variable "existing_db_name" {
   type        = string
-  description = "Database password"
+  description = "Database name in the existing RDS instance for VeriBits"
+  default     = "veribits"
+}
+
+variable "existing_db_username" {
+  type        = string
+  description = "Database username for the existing After Dark Systems RDS instance"
+  sensitive   = true
+}
+
+variable "existing_db_password" {
+  type        = string
+  description = "Database password for the existing After Dark Systems RDS instance"
   sensitive   = true
 }
 

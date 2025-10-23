@@ -1,0 +1,17 @@
+#!/bin/bash
+# Terraform wrapper for macOS - redirects cache/temp to user directories
+
+# Set Terraform plugin cache directory to user's home
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
+# Set temp directory to user-writable location
+export TMPDIR="$HOME/.terraform.d/tmp"
+export TMP="$TMPDIR"
+export TEMP="$TMPDIR"
+
+# Create directories if they don't exist
+mkdir -p "$TF_PLUGIN_CACHE_DIR"
+mkdir -p "$TMPDIR"
+
+# Run terraform with all arguments passed to this script
+exec terraform "$@"

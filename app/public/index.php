@@ -36,6 +36,8 @@ use VeriBits\Controllers\ArchiveInspectionController;
 use VeriBits\Controllers\DNSCheckController;
 use VeriBits\Controllers\SSLCheckController;
 use VeriBits\Controllers\IDVerificationController;
+use VeriBits\Controllers\FileMagicController;
+use VeriBits\Controllers\FileSignatureController;
 
 // Initialize configuration
 Config::load();
@@ -131,6 +133,18 @@ try {
     // ID verification endpoint (protected)
     if ($uri === '/api/v1/verify/id' && $method === 'POST') {
         (new IDVerificationController())->verify();
+        exit;
+    }
+
+    // File magic number analysis endpoint (protected)
+    if ($uri === '/api/v1/file-magic' && $method === 'POST') {
+        (new FileMagicController())->analyze();
+        exit;
+    }
+
+    // File signature verification endpoint (protected)
+    if ($uri === '/api/v1/verify/file-signature' && $method === 'POST') {
+        (new FileSignatureController())->verify();
         exit;
     }
 

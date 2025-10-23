@@ -146,30 +146,8 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
-resource "aws_security_group" "rds_sg" {
-  name        = "veribits-rds-sg"
-  description = "Security group for VeriBits RDS"
-  vpc_id      = data.aws_vpc.afterdarksys.id
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_sg.id]
-    description     = "PostgreSQL from ECS"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "veribits-rds-sg"
-  }
-}
+# Note: Using existing After Dark Systems RDS security group
+# Security rule added via aws_security_group_rule.veribits_to_db below
 
 resource "aws_security_group" "redis_sg" {
   name        = "veribits-redis-sg"
@@ -352,11 +330,11 @@ resource "aws_ecs_task_definition" "api" {
       environment = [
         { name = "APP_ENV", value = "production" },
         { name = "JWT_SECRET", value = var.jwt_secret },
-        { name = "DB_HOST", value = aws_db_instance.pg.address },
+        { name = "DB_HOST", value = data.aws_db_instance.afterdarksys_pg.address },
         { name = "DB_PORT", value = "5432" },
-        { name = "DB_NAME", value = "veribits" },
-        { name = "DB_USER", value = var.db_username },
-        { name = "DB_PASSWORD", value = var.db_password },
+        { name = "DB_NAME", value = var.existing_db_name },
+        { name = "DB_USER", value = var.existing_db_username },
+        { name = "DB_PASSWORD", value = var.existing_db_password },
         { name = "REDIS_HOST", value = aws_elasticache_cluster.redis.cache_nodes[0].address },
         { name = "REDIS_PORT", value = "6379" },
         { name = "ID_VERIFY_API_KEY", value = var.id_verify_api_key }
@@ -405,35 +383,20 @@ resource "aws_ecs_service" "api" {
   }
 }
 
-# RDS PostgreSQL
-resource "aws_db_subnet_group" "db" {
-  name       = "veribits-db-subnets"
-  subnet_ids = local.private_subnet_ids
-
-  tags = {
-    Name = "veribits-db-subnets"
-  }
+# Use existing After Dark Systems RDS PostgreSQL
+data "aws_db_instance" "afterdarksys_pg" {
+  db_instance_identifier = var.existing_db_identifier
 }
 
-resource "aws_db_instance" "pg" {
-  identifier             = "veribits-pg"
-  engine                 = "postgres"
-  engine_version         = "15.4"
-  instance_class         = "db.t3.small"
-  allocated_storage      = 20
-  storage_type           = "gp3"
-  username               = var.db_username
-  password               = var.db_password
-  db_name                = "veribits"
-  db_subnet_group_name   = aws_db_subnet_group.db.name
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  publicly_accessible    = false
-  skip_final_snapshot    = true
-  backup_retention_period = 7
-
-  tags = {
-    Name = "veribits-pg"
-  }
+# Update existing RDS security group to allow VeriBits ECS access
+resource "aws_security_group_rule" "veribits_to_db" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ecs_sg.id
+  security_group_id        = data.aws_db_instance.afterdarksys_pg.vpc_security_groups[0]
+  description              = "Allow VeriBits ECS tasks to access database"
 }
 
 # ElastiCache Redis
@@ -517,8 +480,8 @@ output "ecr_repo" {
 }
 
 output "db_endpoint" {
-  value       = aws_db_instance.pg.address
-  description = "RDS endpoint"
+  value       = data.aws_db_instance.afterdarksys_pg.address
+  description = "RDS endpoint (existing After Dark Systems database)"
   sensitive   = true
 }
 
@@ -554,28 +517,21 @@ output "route53_name_servers" {
 }
 
 output "dns_setup_instructions" {
-  value = var.create_route53_zone ? <<-EOT
-    ========================================
-    IMPORTANT: DNS Setup Required
-    ========================================
-
-    A new Route53 hosted zone has been created for veribits.com
-
-    You MUST update your domain registrar with these name servers:
-    ${join("\n    ", local.route53_name_servers)}
-
-    Steps:
-    1. Log in to your domain registrar (where you bought veribits.com)
-    2. Find the DNS/Nameserver settings
-    3. Replace the current nameservers with the ones above
-    4. Save changes
-
-    DNS propagation can take 24-48 hours.
-
-    To check propagation status:
-    ./scripts/check-dns.sh
-    ========================================
-  EOT
-  : "Using existing Route53 zone - no action needed"
-  description = "DNS setup instructions"
+  value = var.create_route53_zone ? join("\n", [
+    "========================================",
+    "IMPORTANT: DNS Setup Required",
+    "========================================",
+    "A new Route53 hosted zone has been created for veribits.com",
+    "You MUST update your domain registrar with these name servers:",
+    join("\n", local.route53_name_servers),
+    "",
+    "Steps:",
+    "1. Log in to your domain registrar (where you bought veribits.com)",
+    "2. Find the DNS/Nameserver settings",
+    "3. Replace the current nameservers with the ones above",
+    "4. Save changes",
+    "",
+    "DNS propagation can take 24-48 hours.",
+    "========================================"
+  ]) : "Using existing Route53 zone - no action needed"
 }

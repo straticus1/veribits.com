@@ -35,6 +35,10 @@ class Database {
         }
     }
 
+    public static function getConnection(): \PDO {
+        return self::connect();
+    }
+
     public static function query(string $sql, array $params = []): \PDOStatement {
         $pdo = self::connect();
         $stmt = $pdo->prepare($sql);
