@@ -1,0 +1,146 @@
+---
+- name: Deploy VeriBits to After Dark Systems VPC
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars:
+    terraform_dir: "{{ playbook_dir }}/../infrastructure/terraform"
+    docker_dir: "{{ playbook_dir }}/../docker"
+    app_dir: "{{ playbook_dir }}/../app"
+    frontend_dir: "{{ playbook_dir }}/../frontend"
+
+  tasks:
+    - name: Check for AWS credentials
+      shell: aws sts get-caller-identity
+      register: aws_check
+      changed_when: false
+
+    - name: Display AWS account
+      debug:
+        msg: "Deploying with AWS Account: {{ (aws_check.stdout | from_json).Account }}"
+
+    - name: Initialize Terraform
+      command: terraform init
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: tf_init
+
+    - name: Plan Terraform deployment
+      command: terraform plan -out=tfplan
+      args:
+        chdir: "{{ terraform_dir }}"
+      environment:
+        TF_VAR_jwt_secret: "{{ lookup('env', 'JWT_SECRET') | default('change-me-in-production', true) }}"
+        TF_VAR_db_password: "{{ lookup('env', 'DB_PASSWORD') | default('changeme123', true) }}"
+        TF_VAR_id_verify_api_key: "{{ lookup('env', 'ID_VERIFY_API_KEY') | default('', true) }}"
+
+    - name: Apply Terraform
+      command: terraform apply tfplan
+      args:
+        chdir: "{{ terraform_dir }}"
+
+    - name: Get Terraform outputs
+      command: terraform output -json
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: tf_outputs
+      changed_when: false
+
+    - name: Parse Terraform outputs
+      set_fact:
+        ecr_repo: "{{ (tf_outputs.stdout | from_json).ecr_repo.value }}"
+        alb_dns: "{{ (tf_outputs.stdout | from_json).alb_dns.value }}"
+        cognito_pool_id: "{{ (tf_outputs.stdout | from_json).cognito_user_pool_id.value }}"
+        cognito_client_id: "{{ (tf_outputs.stdout | from_json).cognito_client_id.value }}"
+
+    - name: Display deployment info
+      debug:
+        msg:
+          - "ECR Repository: {{ ecr_repo }}"
+          - "ALB DNS: {{ alb_dns }}"
+          - "Cognito Pool ID: {{ cognito_pool_id }}"
+          - "Cognito Client ID: {{ cognito_client_id }}"
+
+    - name: Get AWS region
+      shell: aws configure get region || echo "us-east-1"
+      register: aws_region_output
+      changed_when: false
+
+    - name: Set AWS region
+      set_fact:
+        aws_region: "{{ aws_region_output.stdout }}"
+
+    - name: Login to ECR
+      shell: aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_repo }}
+      changed_when: false
+
+    - name: Build Docker image
+      docker_image:
+        name: veribits-api
+        build:
+          path: "{{ playbook_dir }}/.."
+          dockerfile: "{{ docker_dir }}/Dockerfile"
+        source: build
+        tag: latest
+
+    - name: Tag Docker image for ECR
+      docker_image:
+        name: veribits-api
+        repository: "{{ ecr_repo }}"
+        tag: latest
+        source: local
+
+    - name: Push Docker image to ECR
+      docker_image:
+        name: "{{ ecr_repo }}"
+        tag: latest
+        push: yes
+        source: local
+
+    - name: Update ECS service to use new image
+      shell: |
+        aws ecs update-service \
+          --cluster veribits-cluster \
+          --service veribits-api-svc \
+          --force-new-deployment \
+          --region {{ aws_region }}
+      register: ecs_update
+
+    - name: Wait for ECS service to stabilize
+      shell: |
+        aws ecs wait services-stable \
+          --cluster veribits-cluster \
+          --services veribits-api-svc \
+          --region {{ aws_region }}
+
+    - name: Run database migrations
+      shell: |
+        TASK_ARN=$(aws ecs list-tasks \
+          --cluster veribits-cluster \
+          --service-name veribits-api-svc \
+          --region {{ aws_region }} \
+          --query 'taskArns[0]' \
+          --output text)
+
+        aws ecs execute-command \
+          --cluster veribits-cluster \
+          --task $TASK_ARN \
+          --container api \
+          --command "psql -h {{ lookup('env', 'DB_HOST') }} -U veribits -d veribits -f /var/www/db/schema.sql" \
+          --interactive \
+          --region {{ aws_region }}
+      ignore_errors: yes
+
+    - name: Display deployment summary
+      debug:
+        msg:
+          - "========================================="
+          - "VeriBits Deployment Complete!"
+          - "========================================="
+          - "Website: https://veribits.com"
+          - "Website: https://www.veribits.com"
+          - "ALB: {{ alb_dns }}"
+          - "Cognito Pool: {{ cognito_pool_id }}"
+          - "Cognito Client: {{ cognito_client_id }}"
+          - "========================================="

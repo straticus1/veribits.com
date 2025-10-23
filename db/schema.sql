@@ -64,3 +64,96 @@ CREATE TABLE IF NOT EXISTS invoices (
   period TEXT NOT NULL, amount_cents INT NOT NULL, status TEXT NOT NULL DEFAULT 'open',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(), paid_at TIMESTAMPTZ
 );
+CREATE TABLE IF NOT EXISTS malware_scans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE SET NULL,
+  file_hash TEXT NOT NULL,
+  file_size_bytes BIGINT NOT NULL,
+  scan_status TEXT NOT NULL, -- 'clean', 'infected', 'error'
+  threats_found JSONB,
+  clamav_version TEXT,
+  signature_version TEXT,
+  scan_time_ms INT,
+  badge_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_malware_scans_hash ON malware_scans(file_hash);
+CREATE INDEX IF NOT EXISTS idx_malware_scans_badge ON malware_scans(badge_id);
+CREATE TABLE IF NOT EXISTS archive_inspections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE SET NULL,
+  file_hash TEXT NOT NULL,
+  archive_type TEXT NOT NULL, -- 'zip', 'tar', 'tar.gz', 'tar.bz2', 'tar.xz'
+  total_files INT NOT NULL,
+  total_size_bytes BIGINT NOT NULL,
+  compression_ratio NUMERIC(10,2),
+  contents JSONB NOT NULL,
+  suspicious_flags JSONB,
+  integrity_status TEXT NOT NULL, -- 'ok', 'corrupted', 'suspicious'
+  badge_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_archive_inspections_hash ON archive_inspections(file_hash);
+CREATE INDEX IF NOT EXISTS idx_archive_inspections_badge ON archive_inspections(badge_id);
+CREATE TABLE IF NOT EXISTS dns_checks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE SET NULL,
+  domain TEXT NOT NULL,
+  check_type TEXT NOT NULL, -- 'full', 'records', 'security', 'email', 'propagation'
+  dns_records JSONB,
+  dnssec_status TEXT,
+  blacklist_status JSONB,
+  email_config JSONB, -- SPF, DKIM, DMARC
+  propagation_results JSONB,
+  health_score INT,
+  issues_found JSONB,
+  badge_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_dns_checks_domain ON dns_checks(domain);
+CREATE INDEX IF NOT EXISTS idx_dns_checks_badge ON dns_checks(badge_id);
+CREATE INDEX IF NOT EXISTS idx_dns_checks_created ON dns_checks(created_at DESC);
+CREATE TABLE IF NOT EXISTS ssl_checks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE SET NULL,
+  check_type TEXT NOT NULL, -- 'website', 'certificate', 'key_match'
+  domain TEXT,
+  certificate_info JSONB NOT NULL,
+  issuer_info JSONB,
+  validity_info JSONB NOT NULL,
+  subject_key_identifier TEXT,
+  authority_key_identifier TEXT,
+  key_match_result JSONB,
+  security_score INT,
+  warnings JSONB,
+  badge_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_ssl_checks_domain ON ssl_checks(domain);
+CREATE INDEX IF NOT EXISTS idx_ssl_checks_badge ON ssl_checks(badge_id);
+CREATE INDEX IF NOT EXISTS idx_ssl_checks_created ON ssl_checks(created_at DESC);
+CREATE TABLE IF NOT EXISTS id_verifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  api_key_id UUID REFERENCES api_keys(id) ON DELETE SET NULL,
+  verification_status TEXT NOT NULL, -- 'verified', 'failed', 'pending', 'error'
+  id_document_hash TEXT NOT NULL,
+  selfie_hash TEXT NOT NULL,
+  external_verification_id TEXT,
+  verification_details JSONB,
+  confidence_score NUMERIC(5,2),
+  face_match_score NUMERIC(5,2),
+  document_type TEXT,
+  extracted_data JSONB,
+  warnings JSONB,
+  badge_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_id_verifications_status ON id_verifications(verification_status);
+CREATE INDEX IF NOT EXISTS idx_id_verifications_badge ON id_verifications(badge_id);
+CREATE INDEX IF NOT EXISTS idx_id_verifications_user ON id_verifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_id_verifications_created ON id_verifications(created_at DESC);

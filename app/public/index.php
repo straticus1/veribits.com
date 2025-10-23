@@ -31,6 +31,11 @@ use VeriBits\Controllers\BadgeController;
 use VeriBits\Controllers\AuthController;
 use VeriBits\Controllers\WebhookController;
 use VeriBits\Controllers\BillingController;
+use VeriBits\Controllers\MalwareScanController;
+use VeriBits\Controllers\ArchiveInspectionController;
+use VeriBits\Controllers\DNSCheckController;
+use VeriBits\Controllers\SSLCheckController;
+use VeriBits\Controllers\IDVerificationController;
 
 // Initialize configuration
 Config::load();
@@ -88,6 +93,44 @@ try {
     }
     if ($uri === '/api/v1/verify/tx' && $method === 'POST') {
         (new VerifyController())->transaction();
+        exit;
+    }
+
+    // Malware scan endpoint (protected)
+    if ($uri === '/api/v1/verify/malware' && $method === 'POST') {
+        (new MalwareScanController())->scan();
+        exit;
+    }
+
+    // Archive inspection endpoint (protected)
+    if ($uri === '/api/v1/inspect/archive' && $method === 'POST') {
+        (new ArchiveInspectionController())->inspect();
+        exit;
+    }
+
+    // DNS check endpoint (protected)
+    if ($uri === '/api/v1/verify/dns' && $method === 'POST') {
+        (new DNSCheckController())->check();
+        exit;
+    }
+
+    // SSL check endpoints (protected)
+    if ($uri === '/api/v1/verify/ssl/website' && $method === 'POST') {
+        (new SSLCheckController())->checkWebsite();
+        exit;
+    }
+    if ($uri === '/api/v1/verify/ssl/certificate' && $method === 'POST') {
+        (new SSLCheckController())->checkCertificate();
+        exit;
+    }
+    if ($uri === '/api/v1/verify/ssl/key-match' && $method === 'POST') {
+        (new SSLCheckController())->verifyKeyMatch();
+        exit;
+    }
+
+    // ID verification endpoint (protected)
+    if ($uri === '/api/v1/verify/id' && $method === 'POST') {
+        (new IDVerificationController())->verify();
         exit;
     }
 

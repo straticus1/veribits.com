@@ -5,24 +5,30 @@
 @layer base {
   html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply dark;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-dark-900 text-gray-100;
   }
 }
 
 @layer components {
+  /* After Dark Systems Button Styles */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900;
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-brand-green text-white hover:bg-brand-green-dark focus:ring-brand-green-light;
   }
 
   .btn-secondary {
-    @apply btn bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500;
+    @apply btn bg-dark-700 text-gray-100 hover:bg-dark-600 border border-dark-600 focus:ring-dark-600;
+  }
+
+  .btn-brand {
+    @apply btn bg-gradient-brand text-white hover:opacity-90 focus:ring-brand-blue-light;
   }
 
   .btn-success {
@@ -30,38 +36,63 @@
   }
 
   .btn-warning {
-    @apply btn bg-warning-600 text-white hover:bg-warning-700 focus:ring-warning-500;
+    @apply btn bg-brand-amber text-dark-900 hover:bg-brand-amber-dark focus:ring-brand-amber-light;
   }
 
   .btn-danger {
     @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
   }
 
+  /* Dark Theme Input Styles */
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm;
+    @apply block w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-transparent transition-all;
   }
 
+  /* Dark Theme Card Styles */
   .card {
-    @apply bg-white shadow rounded-lg p-6;
+    @apply bg-dark-800 border border-dark-700 rounded-lg p-6 shadow-xl;
   }
 
+  .card-hover {
+    @apply card hover:border-brand-green transition-all duration-200 cursor-pointer;
+  }
+
+  /* Badge Styles */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
   }
 
   .badge-success {
-    @apply badge bg-success-100 text-success-800;
+    @apply badge bg-success-600 text-white;
   }
 
   .badge-warning {
-    @apply badge bg-warning-100 text-warning-800;
+    @apply badge bg-brand-amber text-dark-900;
   }
 
   .badge-danger {
-    @apply badge bg-danger-100 text-danger-800;
+    @apply badge bg-danger-600 text-white;
+  }
+
+  .badge-info {
+    @apply badge bg-info-600 text-white;
   }
 
   .badge-gray {
-    @apply badge bg-gray-100 text-gray-800;
+    @apply badge bg-dark-700 text-gray-300;
+  }
+
+  /* Link Styles */
+  .link {
+    @apply text-brand-amber hover:text-brand-amber-light transition-colors underline;
+  }
+
+  .link-subtle {
+    @apply text-gray-400 hover:text-brand-amber transition-colors;
+  }
+
+  /* Gradient Text */
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-blue-light to-brand-blue;
   }
 }
