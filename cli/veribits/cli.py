@@ -652,5 +652,325 @@ def cert_convert(cert_file, key_file, format, password, alias, output):
         sys.exit(1)
 
 
+@main.command()
+@click.argument("target")
+@click.option("--max-hops", "-m", default=30, help="Maximum number of hops")
+def traceroute(target, max_hops):
+    """Perform visual traceroute to destination"""
+    console.print(f"[bold cyan]Tracing route to {target}...[/]\n")
+    console.print("[dim]This may take 30-60 seconds...[/]\n")
+
+    result = api_request("/tools/traceroute", "POST", {
+        "target": target,
+        "max_hops": max_hops
+    })
+
+    data = result.get("data", {})
+    hops = data.get("hops", [])
+
+    console.print(f"[bold]Target:[/] {data.get('target')}")
+    console.print(f"[bold]Total Hops:[/] {data.get('total_hops')}\n")
+
+    if hops:
+        table = Table(title="Traceroute Hops")
+        table.add_column("Hop", style="cyan", justify="right")
+        table.add_column("IP Address", style="yellow")
+        table.add_column("Hostname", style="green")
+        table.add_column("Location", style="blue")
+        table.add_column("Latency (ms)", style="magenta")
+
+        for hop in hops:
+            if hop.get("timeout"):
+                table.add_row(
+                    str(hop["hop"]),
+                    "*",
+                    "Request timed out",
+                    "-",
+                    "-"
+                )
+            else:
+                avg_latency = "N/A"
+                if hop.get("latencies"):
+                    avg = sum(hop["latencies"]) / len(hop["latencies"])
+                    avg_latency = f"{avg:.2f}"
+
+                location = "-"
+                if hop.get("location"):
+                    loc = hop["location"]
+                    location = f"{loc.get('city', '')}, {loc.get('country', '')}".strip(", ")
+
+                table.add_row(
+                    str(hop["hop"]),
+                    hop.get("ip", "N/A"),
+                    hop.get("hostname", "-"),
+                    location,
+                    avg_latency
+                )
+
+        console.print(table)
+    else:
+        console.print("[yellow]No hops found[/]")
+
+
+@main.command()
+@click.argument("query")
+def bgp_prefix(query):
+    """Lookup BGP prefix or IP address"""
+    console.print(f"[bold cyan]BGP Prefix Lookup for {query}...[/]\n")
+
+    result = api_request("/bgp/prefix", "POST", {
+        "query": query
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]Prefix:[/] [cyan]{data.get('prefix')}[/]")
+    console.print(f"[bold]Name:[/] {data.get('name', 'N/A')}")
+    console.print(f"[bold]Description:[/] {data.get('description', 'N/A')}")
+    console.print(f"[bold]Country:[/] {data.get('country_code', 'N/A')}")
+    console.print(f"[bold]RIR:[/] {data.get('rir_name', 'N/A')}")
+
+    asns = data.get("asns", [])
+    if asns:
+        asn_list = ", ".join([f"AS{asn.get('asn')}" for asn in asns])
+        console.print(f"[bold]Origin ASNs:[/] {asn_list}")
+
+    rpki = data.get("rpki_validation", 'unknown')
+    rpki_colors = {"valid": "green", "invalid": "red", "unknown": "yellow"}
+    rpki_color = rpki_colors.get(rpki, "white")
+    console.print(f"[bold]RPKI Status:[/] [{rpki_color}]{rpki.upper()}[/]")
+
+
+@main.command()
+@click.argument("asn")
+def bgp_asn(asn):
+    """Lookup AS (Autonomous System) information"""
+    console.print(f"[bold cyan]BGP AS Lookup for {asn}...[/]\n")
+
+    result = api_request("/bgp/asn", "POST", {
+        "asn": asn
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]ASN:[/] AS{data.get('asn')}")
+    console.print(f"[bold]Name:[/] {data.get('name', 'N/A')}")
+    console.print(f"[bold]Description:[/] {data.get('description', 'N/A')}")
+    console.print(f"[bold]Country:[/] {data.get('country_code', 'N/A')}")
+
+    if data.get('website'):
+        console.print(f"[bold]Website:[/] [link={data['website']}]{data['website']}[/]")
+
+    if data.get('looking_glass'):
+        console.print(f"[bold]Looking Glass:[/] {data['looking_glass']}")
+
+    if data.get('traffic_estimation'):
+        console.print(f"[bold]Traffic Estimation:[/] {data['traffic_estimation']}")
+
+    if data.get('traffic_ratio'):
+        console.print(f"[bold]Traffic Ratio:[/] {data['traffic_ratio']}")
+
+    contacts = data.get("email_contacts", [])
+    if contacts:
+        console.print(f"\n[bold]Email Contacts:[/]")
+        for contact in contacts:
+            console.print(f"  • {contact}")
+
+
+@main.command()
+@click.argument("asn")
+def bgp_prefixes(asn):
+    """Get prefixes announced by an AS"""
+    console.print(f"[bold cyan]Getting Prefixes for AS{asn}...[/]\n")
+
+    result = api_request("/bgp/asn/prefixes", "POST", {
+        "asn": asn
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]IPv4 Prefixes:[/] {data.get('ipv4_count', 0)}")
+    console.print(f"[bold]IPv6 Prefixes:[/] {data.get('ipv6_count', 0)}\n")
+
+    ipv4_prefixes = data.get("ipv4_prefixes", [])
+    if ipv4_prefixes:
+        table = Table(title="IPv4 Prefixes (First 50)")
+        table.add_column("Prefix", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Description", style="green")
+
+        for prefix in ipv4_prefixes[:50]:
+            table.add_row(
+                prefix.get("prefix", ""),
+                prefix.get("name", ""),
+                prefix.get("description", "")
+            )
+
+        console.print(table)
+
+        if len(ipv4_prefixes) > 50:
+            console.print(f"\n[dim]... and {len(ipv4_prefixes) - 50} more prefixes[/]")
+
+
+@main.command()
+@click.argument("asn")
+def bgp_peers(asn):
+    """Get BGP peers for an AS"""
+    console.print(f"[bold cyan]Getting BGP Peers for AS{asn}...[/]\n")
+
+    result = api_request("/bgp/asn/peers", "POST", {
+        "asn": asn
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]IPv4 Peers:[/] {data.get('ipv4_peer_count', 0)}")
+    console.print(f"[bold]IPv6 Peers:[/] {data.get('ipv6_peer_count', 0)}\n")
+
+    ipv4_peers = data.get("ipv4_peers", [])
+    if ipv4_peers:
+        table = Table(title="IPv4 Peers")
+        table.add_column("ASN", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Country", style="green")
+
+        for peer in ipv4_peers:
+            table.add_row(
+                f"AS{peer.get('asn', '')}",
+                peer.get("name", ""),
+                peer.get("country_code", "")
+            )
+
+        console.print(table)
+
+
+@main.command()
+@click.argument("asn")
+def bgp_upstreams(asn):
+    """Get transit providers (upstreams) for an AS"""
+    console.print(f"[bold cyan]Getting Transit Providers for AS{asn}...[/]\n")
+
+    result = api_request("/bgp/asn/upstreams", "POST", {
+        "asn": asn
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]IPv4 Upstreams:[/] {data.get('ipv4_upstream_count', 0)}")
+    console.print(f"[bold]IPv6 Upstreams:[/] {data.get('ipv6_upstream_count', 0)}\n")
+
+    ipv4_upstreams = data.get("ipv4_upstreams", [])
+    if ipv4_upstreams:
+        table = Table(title="IPv4 Transit Providers")
+        table.add_column("ASN", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Country", style="green")
+
+        for upstream in ipv4_upstreams:
+            table.add_row(
+                f"AS{upstream.get('asn', '')}",
+                upstream.get("name", ""),
+                upstream.get("country_code", "")
+            )
+
+        console.print(table)
+    else:
+        console.print("[yellow]No upstream providers found - this may be a Tier-1 AS[/]")
+
+
+@main.command()
+@click.argument("asn")
+def bgp_downstreams(asn):
+    """Get customers (downstreams) for an AS"""
+    console.print(f"[bold cyan]Getting Customers for AS{asn}...[/]\n")
+
+    result = api_request("/bgp/asn/downstreams", "POST", {
+        "asn": asn
+    })
+
+    data = result.get("data", {})
+
+    console.print(f"[bold]IPv4 Downstreams:[/] {data.get('ipv4_downstream_count', 0)}")
+    console.print(f"[bold]IPv6 Downstreams:[/] {data.get('ipv6_downstream_count', 0)}\n")
+
+    ipv4_downstreams = data.get("ipv4_downstreams", [])
+    if ipv4_downstreams:
+        table = Table(title="IPv4 Customers (First 50)")
+        table.add_column("ASN", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Country", style="green")
+
+        for downstream in ipv4_downstreams[:50]:
+            table.add_row(
+                f"AS{downstream.get('asn', '')}",
+                downstream.get("name", ""),
+                downstream.get("country_code", "")
+            )
+
+        console.print(table)
+
+        if len(ipv4_downstreams) > 50:
+            console.print(f"\n[dim]... and {len(ipv4_downstreams) - 50} more customers[/]")
+    else:
+        console.print("[yellow]No downstream customers found[/]")
+
+
+@main.command()
+@click.argument("query")
+def bgp_search(query):
+    """Search for AS by name or description"""
+    console.print(f"[bold cyan]Searching BGP for '{query}'...[/]\n")
+
+    result = api_request("/bgp/search", "POST", {
+        "query": query
+    })
+
+    data = result.get("data", {})
+    results = data.get("results", {})
+
+    asns = results.get("asns", [])
+    ipv4_prefixes = results.get("ipv4_prefixes", [])
+    ipv6_prefixes = results.get("ipv6_prefixes", [])
+
+    total_results = len(asns) + len(ipv4_prefixes) + len(ipv6_prefixes)
+
+    if total_results == 0:
+        console.print("[yellow]No results found[/]")
+        return
+
+    console.print(f"[bold]Total Results:[/] {total_results}\n")
+
+    if asns:
+        table = Table(title="Autonomous Systems")
+        table.add_column("ASN", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Country", style="green")
+
+        for asn in asns:
+            table.add_row(
+                f"AS{asn.get('asn', '')}",
+                asn.get("name", ""),
+                asn.get("country_code", "")
+            )
+
+        console.print(table)
+
+    if ipv4_prefixes:
+        console.print("\n")
+        table = Table(title="IPv4 Prefixes")
+        table.add_column("Prefix", style="cyan")
+        table.add_column("Name", style="yellow")
+        table.add_column("Description", style="green")
+
+        for prefix in ipv4_prefixes:
+            table.add_row(
+                prefix.get("prefix", ""),
+                prefix.get("name", ""),
+                prefix.get("description", "")
+            )
+
+        console.print(table)
+
+
 if __name__ == "__main__":
     main()

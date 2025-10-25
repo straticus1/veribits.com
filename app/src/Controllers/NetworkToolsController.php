@@ -961,4 +961,164 @@ class NetworkToolsController
             Response::error('Certificate conversion failed: ' . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * Perform visual traceroute to a destination
+     */
+    public function traceroute(): void
+    {
+        $auth = Auth::optionalAuth();
+
+        if (!$auth['authenticated']) {
+            $scanCheck = RateLimit::checkAnonymousScan($auth['ip_address'], 0);
+            if (!$scanCheck['allowed']) {
+                Response::error($scanCheck['message'], 429);
+                return;
+            }
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $target = $input['target'] ?? '';
+        $maxHops = min((int)($input['max_hops'] ?? 30), 64); // Cap at 64 hops
+
+        if (empty($target)) {
+            Response::error('Target hostname or IP address is required', 400);
+            return;
+        }
+
+        // Validate target (domain or IP)
+        $isIP = filter_var($target, FILTER_VALIDATE_IP);
+        $isDomain = !$isIP && preg_match('/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i', $target);
+
+        if (!$isIP && !$isDomain) {
+            Response::error('Invalid hostname or IP address', 400);
+            return;
+        }
+
+        try {
+            $hops = [];
+            $cmd = sprintf(
+                "traceroute -m %d -q 3 -w 2 %s 2>&1",
+                $maxHops,
+                escapeshellarg($target)
+            );
+
+            exec($cmd, $output, $returnVar);
+
+            // Parse traceroute output
+            foreach ($output as $line) {
+                // Skip header line
+                if (strpos($line, 'traceroute to') !== false) {
+                    continue;
+                }
+
+                // Parse hop line format: " 1  router.local (192.168.1.1)  1.234 ms  1.456 ms  1.678 ms"
+                if (preg_match('/^\s*(\d+)\s+(.+)$/', $line, $matches)) {
+                    $hopNum = (int)$matches[1];
+                    $hopData = trim($matches[2]);
+
+                    $hop = [
+                        'hop' => $hopNum,
+                        'hostname' => null,
+                        'ip' => null,
+                        'latencies' => [],
+                        'timeout' => false,
+                        'location' => null
+                    ];
+
+                    // Check for timeout
+                    if (strpos($hopData, '* * *') !== false) {
+                        $hop['timeout'] = true;
+                        $hops[] = $hop;
+                        continue;
+                    }
+
+                    // Extract hostname and IP
+                    if (preg_match('/^([^\(]+)\s*\(([^\)]+)\)/', $hopData, $addrMatch)) {
+                        $hop['hostname'] = trim($addrMatch[1]);
+                        $hop['ip'] = trim($addrMatch[2]);
+                    } elseif (preg_match('/^(\d+\.\d+\.\d+\.\d+)/', $hopData, $ipMatch)) {
+                        $hop['ip'] = $ipMatch[1];
+                    }
+
+                    // Extract latencies (ms values)
+                    if (preg_match_all('/(\d+\.?\d*)\s*ms/', $hopData, $latencyMatches)) {
+                        $hop['latencies'] = array_map('floatval', $latencyMatches[1]);
+                    }
+
+                    // Get geolocation for this hop's IP
+                    if ($hop['ip']) {
+                        $hop['location'] = $this->getIpGeolocation($hop['ip']);
+                    }
+
+                    $hops[] = $hop;
+                }
+            }
+
+            if (empty($hops)) {
+                Response::error('Traceroute failed or returned no data. The traceroute command may not be available.', 500);
+                return;
+            }
+
+            if (!$auth['authenticated']) {
+                RateLimit::incrementAnonymousScan($auth['ip_address']);
+            }
+
+            Response::success('Traceroute completed', [
+                'target' => $target,
+                'hops' => $hops,
+                'total_hops' => count($hops),
+                'max_hops' => $maxHops
+            ]);
+
+        } catch (\Exception $e) {
+            Response::error('Traceroute failed: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get geolocation data for an IP address
+     */
+    private function getIpGeolocation(string $ip): ?array
+    {
+        // Skip private/local IPs
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            return null;
+        }
+
+        try {
+            // Use free ip-api.com service (limit: 45 requests/minute)
+            $url = "http://ip-api.com/json/{$ip}?fields=status,country,countryCode,region,regionName,city,lat,lon,isp,org,as";
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 2,
+                    'user_agent' => 'VeriBits/1.0'
+                ]
+            ]);
+
+            $response = @file_get_contents($url, false, $context);
+            if ($response === false) {
+                return null;
+            }
+
+            $data = json_decode($response, true);
+            if ($data && $data['status'] === 'success') {
+                return [
+                    'country' => $data['country'] ?? null,
+                    'country_code' => $data['countryCode'] ?? null,
+                    'region' => $data['regionName'] ?? null,
+                    'city' => $data['city'] ?? null,
+                    'latitude' => $data['lat'] ?? null,
+                    'longitude' => $data['lon'] ?? null,
+                    'isp' => $data['isp'] ?? null,
+                    'org' => $data['org'] ?? null,
+                    'as' => $data['as'] ?? null
+                ];
+            }
+        } catch (\Exception $e) {
+            // Fail silently - geolocation is optional
+        }
+
+        return null;
+    }
 }

@@ -48,6 +48,7 @@ use VeriBits\Controllers\ApiKeyController;
 use VeriBits\Controllers\VerificationsController;
 use VeriBits\Controllers\NetworkToolsController;
 use VeriBits\Controllers\SteganographyController;
+use VeriBits\Controllers\BGPController;
 
 // Initialize configuration
 Config::load();
@@ -368,6 +369,10 @@ try {
         (new NetworkToolsController())->whoisLookup();
         exit;
     }
+    if ($uri === '/api/v1/tools/traceroute' && $method === 'POST') {
+        (new NetworkToolsController())->traceroute();
+        exit;
+    }
     if ($uri === '/api/v1/zone-validate' && $method === 'POST') {
         (new NetworkToolsController())->zoneValidate();
         exit;
@@ -380,6 +385,36 @@ try {
     // Steganography detection (supports anonymous with rate limiting)
     if ($uri === '/api/v1/steganography-detect' && $method === 'POST') {
         (new SteganographyController())->detect();
+        exit;
+    }
+
+    // BGP Intelligence tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/bgp/prefix' && $method === 'POST') {
+        (new BGPController())->prefixLookup();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/asn' && $method === 'POST') {
+        (new BGPController())->asLookup();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/asn/prefixes' && $method === 'POST') {
+        (new BGPController())->asPrefixes();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/asn/peers' && $method === 'POST') {
+        (new BGPController())->asPeers();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/asn/upstreams' && $method === 'POST') {
+        (new BGPController())->asUpstreams();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/asn/downstreams' && $method === 'POST') {
+        (new BGPController())->asDownstreams();
+        exit;
+    }
+    if ($uri === '/api/v1/bgp/search' && $method === 'POST') {
+        (new BGPController())->searchAS();
         exit;
     }
 
