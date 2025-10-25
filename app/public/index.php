@@ -1,5 +1,5 @@
-// © After Dark Systems
 <?php
+// © After Dark Systems
 declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', '0');
@@ -38,6 +38,16 @@ use VeriBits\Controllers\SSLCheckController;
 use VeriBits\Controllers\IDVerificationController;
 use VeriBits\Controllers\FileMagicController;
 use VeriBits\Controllers\FileSignatureController;
+use VeriBits\Controllers\AnonymousLimitsController;
+use VeriBits\Controllers\CryptoValidationController;
+use VeriBits\Controllers\SSLGeneratorController;
+use VeriBits\Controllers\JWTController;
+use VeriBits\Controllers\DeveloperToolsController;
+use VeriBits\Controllers\CodeSigningController;
+use VeriBits\Controllers\ApiKeyController;
+use VeriBits\Controllers\VerificationsController;
+use VeriBits\Controllers\NetworkToolsController;
+use VeriBits\Controllers\SteganographyController;
 
 // Initialize configuration
 Config::load();
@@ -51,10 +61,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Only handle API requests - let Apache serve static files
+if (strpos($uri, '/api/') !== 0) {
+    http_response_code(404);
+    exit;
+}
+
 try {
     // Health check (no auth required)
     if ($uri === '/api/v1/health' && $method === 'GET') {
         (new HealthController())->status();
+        exit;
+    }
+
+    // Anonymous limits info (no auth required)
+    if ($uri === '/api/v1/limits/anonymous' && $method === 'GET') {
+        (new AnonymousLimitsController())->getLimits();
         exit;
     }
 
@@ -110,13 +132,21 @@ try {
         exit;
     }
 
-    // DNS check endpoint (protected)
+    // DNS check endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/dns/check' && $method === 'POST') {
+        (new DNSCheckController())->check();
+        exit;
+    }
     if ($uri === '/api/v1/verify/dns' && $method === 'POST') {
         (new DNSCheckController())->check();
         exit;
     }
 
-    // SSL check endpoints (protected)
+    // SSL check endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/ssl/validate' && $method === 'POST') {
+        (new SSLCheckController())->validate();
+        exit;
+    }
     if ($uri === '/api/v1/verify/ssl/website' && $method === 'POST') {
         (new SSLCheckController())->checkWebsite();
         exit;
@@ -218,6 +248,138 @@ try {
     }
     if ($uri === '/api/v1/billing/webhook/stripe' && $method === 'POST') {
         (new BillingController())->webhookStripe();
+        exit;
+    }
+
+    // Cryptocurrency validation endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/crypto/validate' && $method === 'POST') {
+        (new CryptoValidationController())->validate();
+        exit;
+    }
+    if ($uri === '/api/v1/crypto/validate/bitcoin' && $method === 'POST') {
+        (new CryptoValidationController())->validateBitcoin();
+        exit;
+    }
+    if ($uri === '/api/v1/crypto/validate/ethereum' && $method === 'POST') {
+        (new CryptoValidationController())->validateEthereum();
+        exit;
+    }
+
+    // SSL/TLS tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/ssl/generate-csr' && $method === 'POST') {
+        (new SSLGeneratorController())->generate();
+        exit;
+    }
+    if ($uri === '/api/v1/ssl/validate-csr' && $method === 'POST') {
+        (new SSLGeneratorController())->validateCSR();
+        exit;
+    }
+
+    // JWT tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/jwt/validate' && $method === 'POST') {
+        (new JWTController())->validate();
+        exit;
+    }
+    if ($uri === '/api/v1/jwt/decode' && $method === 'POST') {
+        (new JWTController())->decode();
+        exit;
+    }
+    if ($uri === '/api/v1/jwt/sign' && $method === 'POST') {
+        (new JWTController())->sign();
+        exit;
+    }
+
+    // Developer tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/tools/regex-test' && $method === 'POST') {
+        (new DeveloperToolsController())->regexTest();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/validate-data' && $method === 'POST') {
+        (new DeveloperToolsController())->validateData();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/scan-secrets' && $method === 'POST') {
+        (new DeveloperToolsController())->scanSecrets();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/generate-hash' && $method === 'POST') {
+        (new DeveloperToolsController())->generateHash();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/url-encode' && $method === 'POST') {
+        (new DeveloperToolsController())->urlEncode();
+        exit;
+    }
+
+    // Code signing endpoints
+    if ($uri === '/api/v1/code-signing/sign' && $method === 'POST') {
+        (new CodeSigningController())->sign();
+        exit;
+    }
+    if ($uri === '/api/v1/code-signing/quota' && $method === 'GET') {
+        (new CodeSigningController())->getQuota();
+        exit;
+    }
+
+    // API Keys management (protected)
+    if ($uri === '/api/v1/api-keys' && $method === 'GET') {
+        (new ApiKeyController())->list();
+        exit;
+    }
+    if ($uri === '/api/v1/api-keys' && $method === 'POST') {
+        (new ApiKeyController())->create();
+        exit;
+    }
+    if (preg_match('#^/api/v1/api-keys/(.+)$#', $uri, $m) && $method === 'DELETE') {
+        (new ApiKeyController())->revoke($m[1]);
+        exit;
+    }
+
+    // User profile (protected)
+    if ($uri === '/api/v1/user/profile' && $method === 'GET') {
+        (new AuthController())->profile();
+        exit;
+    }
+
+    // Verifications history (protected)
+    if ($uri === '/api/v1/verifications' && $method === 'GET') {
+        (new VerificationsController())->list();
+        exit;
+    }
+
+    // Network tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/tools/dns-validate' && $method === 'POST') {
+        (new NetworkToolsController())->dnsValidate();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/ip-calculate' && $method === 'POST') {
+        (new NetworkToolsController())->ipCalculate();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/rbl-check' && $method === 'POST') {
+        (new NetworkToolsController())->rblCheck();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/smtp-relay-check' && $method === 'POST') {
+        (new NetworkToolsController())->smtpRelayCheck();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/whois' && $method === 'POST') {
+        (new NetworkToolsController())->whoisLookup();
+        exit;
+    }
+    if ($uri === '/api/v1/zone-validate' && $method === 'POST') {
+        (new NetworkToolsController())->zoneValidate();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/cert-convert' && $method === 'POST') {
+        (new NetworkToolsController())->certConvert();
+        exit;
+    }
+
+    // Steganography detection (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/steganography-detect' && $method === 'POST') {
+        (new SteganographyController())->detect();
         exit;
     }
 

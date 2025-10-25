@@ -207,10 +207,69 @@ resource "aws_lb_target_group" "app_tg" {
   }
 }
 
+# ACM Certificate for SSL/TLS
+resource "aws_acm_certificate" "veribits" {
+  domain_name       = "veribits.com"
+  validation_method = "DNS"
+  subject_alternative_names = ["www.veribits.com"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "veribits-ssl-cert"
+  }
+}
+
+# Route53 DNS validation records for ACM certificate
+resource "aws_route53_record" "cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.veribits.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = local.route53_zone_id
+}
+
+# Wait for certificate validation to complete
+resource "aws_acm_certificate_validation" "veribits" {
+  certificate_arn         = aws_acm_certificate.veribits.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+# HTTP Listener - Redirect to HTTPS
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app.arn
   port              = 80
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# HTTPS Listener - Forward to target group
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.app.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate_validation.veribits.certificate_arn
 
   default_action {
     type             = "forward"
@@ -469,9 +528,31 @@ output "alb_dns" {
   description = "ALB DNS name"
 }
 
+output "certificate_arn" {
+  value       = aws_acm_certificate.veribits.arn
+  description = "ACM certificate ARN"
+}
+
+output "certificate_status" {
+  value       = aws_acm_certificate.veribits.status
+  description = "ACM certificate validation status"
+}
+
 output "veribits_domain" {
   value       = "https://veribits.com"
   description = "VeriBits domain"
+}
+
+output "ssl_info" {
+  value = <<-EOT
+    SSL Certificate configured for:
+    - veribits.com
+    - www.veribits.com
+
+    HTTP (port 80) automatically redirects to HTTPS (port 443)
+    TLS Policy: TLS 1.3 (ELBSecurityPolicy-TLS13-1-2-2021-06)
+  EOT
+  description = "SSL configuration details"
 }
 
 output "ecr_repo" {

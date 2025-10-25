@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - VeriBits</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">VeriBits</a>
+            <ul>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="/dashboard.html">Dashboard</a></li>
+                <li><a href="/settings.html">Settings</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section style="padding: 8rem 2rem 4rem;">
+        <div class="container" style="max-width: 800px;">
+            <h1 style="font-size: 3rem; margin-bottom: 3rem;">Account Settings</h1>
+
+            <div class="feature-card" style="margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Profile Information</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+
+            <div class="feature-card" style="margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Change Password</h2>
+                <form id="password-form">
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" name="current-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" name="new-password" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-new-password">Confirm New Password</label>
+                        <input type="password" id="confirm-new-password" name="confirm-new-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+
+            <div class="feature-card" style="margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1rem;">Subscription</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Current Plan: <strong id="current-plan">Free Trial</strong></p>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Scans Remaining: <strong id="scans-remaining">5</strong></p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="/pricing.html" class="btn btn-primary">Upgrade Plan</a>
+                    <button class="btn btn-secondary" onclick="cancelSubscription()">Cancel Subscription</button>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <h2 style="margin-bottom: 1rem; color: var(--error-color);">Danger Zone</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Once you delete your account, there is no going back. Please be certain.</p>
+                <button class="btn" style="background: var(--error-color); color: white;" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VeriBits by After Dark Systems. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/settings.js"></script>
+</body>
+</html>

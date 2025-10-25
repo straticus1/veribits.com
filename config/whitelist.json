@@ -1,0 +1,7 @@
+{
+  "ip_address6": "2600:4808:6373:f100:606f:7793:203d:81c0",
+  "ip_address4": "24.187.53.3",
+  "account_email": "straticus1@gmail.com",
+  "account_limit": "10000/requests/day",
+  "account_threshold": "180/requests/minute or 10,800/requests/hour"
+}

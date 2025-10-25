@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriBits CLI - Command Line Interface</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">VeriBits</a>
+            <ul>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="/cli.html">CLI</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/login.html">Login</a></li>
+                <li><a href="/signup.html" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section style="padding: 8rem 2rem 4rem;">
+        <div class="container">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">VeriBits CLI</h1>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 1.2rem;">
+                Professional security and developer tools in your terminal
+            </p>
+
+            <!-- Installation -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">📦 Installation</h2>
+
+                <h3 style="margin-bottom: 0.75rem;">Option 1: Install via pip (Recommended)</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; border-left: 3px solid var(--primary-color); margin-bottom: 1.5rem;"><code style="color: var(--accent-color);"># Install globally
+pip install veribits
+
+# Verify installation
+veribits --version
+
+# Check available commands
+veribits --help</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Option 2: Install in virtual environment</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate  # On macOS/Linux
+# or
+venv\Scripts\activate     # On Windows
+
+# Install VeriBits CLI
+pip install veribits</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Option 3: Install from source</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Clone repository
+git clone https://github.com/afterdarksystems/veribits-cli.git
+cd veribits-cli
+
+# Install in development mode
+pip install -e .
+
+# Or build and install
+python setup.py install</code></pre>
+
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(251, 191, 36, 0.1); border-left: 3px solid var(--primary-color); border-radius: 4px;">
+                    <strong>💡 Pro Tip:</strong> Use the short alias <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 3px;">vb</code> instead of <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 3px;">veribits</code> for faster commands!
+                </div>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">System Requirements</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ Python 3.8 or higher</li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ pip package manager</li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ Internet connection for API requests</li>
+                    <li style="padding: 0.5rem 0;">✓ Works on macOS, Linux, and Windows</li>
+                </ul>
+            </div>
+
+            <!-- Features -->
+            <div class="features-grid" style="margin-bottom: 3rem;">
+                <div class="feature-card">
+                    <div class="feature-icon">🔑</div>
+                    <h3>JWT Tools</h3>
+                    <p>Decode, verify, and generate JWT tokens with signature validation</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits jwt-decode "token..."
+veribits jwt-sign --secret "key" \
+  --payload '{"user": "test"}'</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔤</div>
+                    <h3>Regex Tester</h3>
+                    <p>Test regular expressions with real-time matching</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits regex "\\d{3}-\\d{3}-\\d{4}" \
+  "Call 555-123-4567"</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔎</div>
+                    <h3>Secrets Scanner</h3>
+                    <p>Scan code for exposed API keys, tokens, and credentials</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits secrets ./config.yaml
+veribits secrets ./src/*.js</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Hash Generator</h3>
+                    <p>Generate MD5, SHA-256, SHA-512, and bcrypt hashes</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits hash "password123" \
+  -a md5 -a sha256 -a sha512</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">₿</div>
+                    <h3>Crypto Validation</h3>
+                    <p>Validate Bitcoin and Ethereum addresses</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits bitcoin 1A1zP1eP...
+veribits ethereum 0x742d35Cc...</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>File Magic</h3>
+                    <p>Detect file types by magic number</p>
+                    <pre style="background: var(--darker-bg); padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;"><code>veribits file-magic \
+  ./unknown-file.bin</code></pre>
+                </div>
+            </div>
+
+            <!-- All Commands -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">📚 Available Commands</h2>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1rem;">🔐 Security & Cryptography</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                <th style="text-align: left; padding: 0.75rem;">Command</th>
+                                <th style="text-align: left; padding: 0.75rem;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>file-magic FILE</code></td>
+                                <td style="padding: 0.75rem;">Detect file type by magic number</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>bitcoin ADDRESS</code></td>
+                                <td style="padding: 0.75rem;">Validate Bitcoin address or transaction</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>ethereum ADDRESS</code></td>
+                                <td style="padding: 0.75rem;">Validate Ethereum address or transaction</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1rem;">🛠️ Developer Tools</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                <th style="text-align: left; padding: 0.75rem;">Command</th>
+                                <th style="text-align: left; padding: 0.75rem;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>jwt-decode TOKEN</code></td>
+                                <td style="padding: 0.75rem;">Decode and verify JWT token</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>jwt-sign OPTIONS</code></td>
+                                <td style="padding: 0.75rem;">Generate new JWT token</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>regex PATTERN TEXT</code></td>
+                                <td style="padding: 0.75rem;">Test regular expressions</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>secrets FILE</code></td>
+                                <td style="padding: 0.75rem;">Scan for exposed secrets</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>hash TEXT</code></td>
+                                <td style="padding: 0.75rem;">Generate cryptographic hashes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--text-primary); margin-bottom: 1rem;">⚙️ Configuration</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                <th style="text-align: left; padding: 0.75rem;">Command</th>
+                                <th style="text-align: left; padding: 0.75rem;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>config</code></td>
+                                <td style="padding: 0.75rem;">Show current configuration</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <td style="padding: 0.75rem;"><code>limits</code></td>
+                                <td style="padding: 0.75rem;">Check usage limits</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Authentication -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1rem;">🔑 Authentication</h2>
+                <p style="margin-bottom: 1rem;">For unlimited usage and advanced features, set your API key:</p>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; border-left: 3px solid var(--accent-color);"><code style="color: var(--accent-color);">export VERIBITS_API_KEY="your-api-key-here"</code></pre>
+                <p style="margin-top: 1rem;">Get your API key at: <a href="/dashboard.html" style="color: var(--primary-color);">veribits.com/dashboard</a></p>
+            </div>
+
+            <!-- Usage Limits -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1rem;">📊 Usage Limits</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Anonymous (No API Key)</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ 5 free scans per 30-day period</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ 50MB max file size</li>
+                            <li style="padding: 0.5rem 0;">✓ All tools available</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Authenticated</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ 50+ scans per month (Free tier)</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ 200MB max file size</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">✓ Priority processing</li>
+                            <li style="padding: 0.5rem 0;">✓ API access</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 1.5rem; text-align: center;">
+                    <a href="/pricing.html" class="btn btn-primary">View Pricing Plans</a>
+                </p>
+            </div>
+
+            <!-- Example Usage -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">💻 Example Usage</h2>
+
+                <h3 style="margin-bottom: 0.75rem;">JWT Token Operations</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Decode a JWT token
+veribits jwt-decode "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# Decode and verify signature
+veribits jwt-decode "token..." --secret "my-secret-key" --verify
+
+# Generate a new JWT token
+veribits jwt-sign \
+  --secret "my-secret-key" \
+  --payload '{"user_id": 123, "role": "admin"}' \
+  --expires 3600</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Regular Expression Testing</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Test email pattern
+veribits regex "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}" \
+  "Contact: john@example.com and jane@test.org"
+
+# Test phone pattern with flags
+veribits regex "\d{3}-\d{3}-\d{4}" "Call me at 555-123-4567" --flags "gi"</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Security Scanning</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Scan a single file for secrets
+veribits secrets ./config.yaml
+
+# Scan multiple files
+veribits secrets .env
+veribits secrets ./src/config.js
+
+# Scan all JavaScript files (use bash loop)
+for file in src/**/*.js; do
+    veribits secrets "$file"
+done</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Cryptographic Operations</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code># Generate multiple hashes
+veribits hash "mypassword" -a md5 -a sha256 -a sha512
+
+# Validate Bitcoin address
+veribits bitcoin 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+
+# Validate Ethereum address with checksum
+veribits ethereum 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb
+
+# Detect file type
+veribits file-magic ./unknown-file.bin</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Configuration & Limits</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto;"><code># Check your current configuration
+veribits config
+
+# Check usage limits and remaining scans
+veribits limits</code></pre>
+            </div>
+
+            <!-- Scripts and Automation -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">🤖 Scripts & Automation</h2>
+
+                <h3 style="margin-bottom: 0.75rem;">Bash Script - Batch Secret Scanning</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>#!/bin/bash
+# scan-secrets.sh - Scan all source files for exposed secrets
+
+echo "Scanning for secrets in source files..."
+
+# Set API key if you have one
+export VERIBITS_API_KEY="your-api-key"
+
+# Find all relevant source files and scan them
+find ./src -type f \( -name "*.js" -o -name "*.py" -o -name "*.yaml" \) | while read file; do
+    echo "Scanning: $file"
+    veribits secrets "$file"
+done
+
+echo "Scan complete!"</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Python Script - Automated Validation</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>#!/usr/bin/env python3
+# validate_addresses.py - Validate crypto addresses from file
+
+import subprocess
+import sys
+
+def validate_address(address, crypto_type):
+    """Validate a cryptocurrency address using VeriBits CLI"""
+    try:
+        result = subprocess.run(
+            ['veribits', crypto_type, address],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+# Read addresses from file
+with open('addresses.txt', 'r') as f:
+    for line in f:
+        address = line.strip()
+        if address.startswith('0x'):
+            valid = validate_address(address, 'ethereum')
+            print(f"Ethereum {address}: {'✅ Valid' if valid else '❌ Invalid'}")
+        elif address.startswith(('1', '3', 'bc1')):
+            valid = validate_address(address, 'bitcoin')
+            print(f"Bitcoin {address}: {'✅ Valid' if valid else '❌ Invalid'}")</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Git Pre-commit Hook</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>#!/bin/bash
+# .git/hooks/pre-commit - Scan staged files for secrets before commit
+
+echo "🔍 Scanning staged files for secrets..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Scan each staged file
+SECRETS_FOUND=0
+for file in $STAGED_FILES; do
+    if [[ -f "$file" ]]; then
+        echo "Scanning: $file"
+        if veribits secrets "$file" | grep -q "Secrets Found: [1-9]"; then
+            echo "❌ Secrets detected in $file!"
+            SECRETS_FOUND=1
+        fi
+    fi
+done
+
+# Abort commit if secrets found
+if [ $SECRETS_FOUND -eq 1 ]; then
+    echo ""
+    echo "❌ COMMIT BLOCKED: Secrets detected in staged files!"
+    echo "Please remove sensitive data before committing."
+    exit 1
+fi
+
+echo "✅ No secrets detected. Proceeding with commit."
+exit 0</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Makefile Integration</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto;"><code># Makefile - Integrate VeriBits into your build process
+
+.PHONY: security-scan test build
+
+security-scan:
+	@echo "Running security scans..."
+	@veribits secrets ./config
+	@veribits secrets ./src
+	@echo "Security scan complete!"
+
+test: security-scan
+	@echo "Running tests..."
+	@pytest tests/
+
+build: test
+	@echo "Building application..."
+	@docker build -t myapp:latest .</code></pre>
+            </div>
+
+            <!-- CI/CD Integration -->
+            <div class="feature-card" style="margin-bottom: 3rem;">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">🚀 CI/CD Integration</h2>
+
+                <h3 style="margin-bottom: 0.75rem;">GitHub Actions</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>name: Security Scan
+
+on: [push, pull_request]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install VeriBits CLI
+        run: pip install veribits
+
+      - name: Scan for secrets
+        env:
+          VERIBITS_API_KEY: ${{ secrets.VERIBITS_API_KEY }}
+        run: |
+          veribits secrets ./src > secrets-report.txt
+          cat secrets-report.txt
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: secrets-report.txt</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">GitLab CI</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>security_scan:
+  stage: test
+  image: python:3.10
+  before_script:
+    - pip install veribits
+  script:
+    - veribits secrets ./src
+    - veribits secrets ./config
+  artifacts:
+    reports:
+      veribits: secrets-report.txt
+  only:
+    - branches</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Jenkins Pipeline</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1.5rem;"><code>pipeline {
+    agent any
+
+    stages {
+        stage('Security Scan') {
+            steps {
+                sh 'pip install veribits'
+                sh 'veribits secrets ./src'
+                sh 'veribits secrets ./config'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'secrets-report.txt'
+        }
+    }
+}</code></pre>
+
+                <h3 style="margin-bottom: 0.75rem;">Docker Integration</h3>
+                <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto;"><code># Dockerfile - Include security scanning in your build
+
+FROM python:3.10-slim AS security-scan
+
+# Install VeriBits CLI
+RUN pip install veribits
+
+# Copy source code
+COPY ./src /app/src
+
+# Run security scan
+RUN veribits secrets /app/src
+
+# Continue with main build
+FROM python:3.10-slim
+COPY ./src /app/src
+# ... rest of your Dockerfile</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VeriBits. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">
+                A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

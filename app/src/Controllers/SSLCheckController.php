@@ -11,6 +11,71 @@ class SSLCheckController {
     private const UPLOAD_DIR = '/tmp/veribits-ssl';
     private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+    /**
+     * Generic SSL validation - supports anonymous with rate limiting
+     */
+    public function validate(): void {
+        // Optional auth - supports anonymous users with rate limiting
+        $auth = Auth::optionalAuth();
+
+        if (!$auth['authenticated']) {
+            // Check anonymous scan limits
+            $scanCheck = RateLimit::checkAnonymousScan($auth['ip_address'], 0);
+            if (!$scanCheck['allowed']) {
+                Response::error($scanCheck['message'], 429, [
+                    'reason' => $scanCheck['reason'],
+                    'upgrade_url' => '/pricing.html'
+                ]);
+                return;
+            }
+        }
+
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $domain = $body['domain'] ?? '';
+
+        if (empty($domain)) {
+            Response::error('Domain is required', 400);
+            return;
+        }
+
+        $port = $body['port'] ?? 443;
+
+        // Remove protocol if present
+        $domain = preg_replace('#^https?://#i', '', $domain);
+        // Remove path if present
+        $domain = explode('/', $domain)[0];
+        // Remove port if present in domain
+        $domain = explode(':', $domain)[0];
+
+        try {
+            $startTime = microtime(true);
+
+            // Get SSL certificate from website
+            $certInfo = $this->getWebsiteCertificate($domain, (int)$port);
+
+            $checkTimeMs = (int)((microtime(true) - $startTime) * 1000);
+
+            // Increment scan count for anonymous users
+            if (!$auth['authenticated']) {
+                RateLimit::incrementAnonymousScan($auth['ip_address']);
+            }
+
+            Response::success([
+                'domain' => $domain,
+                'port' => $port,
+                'certificate' => $certInfo,
+                'check_time_ms' => $checkTimeMs
+            ]);
+
+        } catch (\Exception $e) {
+            Logger::error('SSL validation failed', [
+                'domain' => $domain,
+                'error' => $e->getMessage()
+            ]);
+            Response::error('SSL validation failed: ' . $e->getMessage(), 400);
+        }
+    }
+
     public function checkWebsite(): void {
         $claims = Auth::requireBearer();
         $userId = $claims['sub'] ?? null;

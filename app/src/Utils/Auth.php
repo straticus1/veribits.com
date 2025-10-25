@@ -122,16 +122,106 @@ class Auth {
         }
     }
 
-    private static function getClientIp(): string {
-        $headers = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP'];
+    /**
+     * Optional authentication - allows anonymous users but enforces rate limits
+     * Returns ['authenticated' => false, 'user_id' => null] for anonymous users
+     */
+    public static function optionalAuth(): array {
+        $hdr = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-        foreach ($headers as $header) {
-            if (!empty($_SERVER[$header])) {
-                $ips = explode(',', $_SERVER[$header]);
-                return trim($ips[0]);
+        // Check if bearer token is present
+        if (preg_match('/Bearer\s+(.*)/i', $hdr, $m)) {
+            $token = trim($m[1]);
+            $secret = Config::getRequired('JWT_SECRET');
+            $payload = Jwt::verify($token, $secret);
+
+            if ($payload) {
+                // Valid token - user is authenticated
+                Logger::debug('Authenticated request', ['user_id' => $payload['sub'] ?? 'unknown']);
+                return [
+                    'authenticated' => true,
+                    'user_id' => $payload['sub'] ?? null,
+                    'email' => $payload['email'] ?? null,
+                    'claims' => $payload
+                ];
             }
         }
 
-        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        // Check API key
+        $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? $_GET['api_key'] ?? null;
+        if ($apiKey) {
+            $keyData = self::validateApiKey($apiKey);
+            if ($keyData) {
+                Logger::debug('Authenticated via API key', ['user_id' => $keyData['user_id']]);
+                return [
+                    'authenticated' => true,
+                    'user_id' => $keyData['user_id'],
+                    'email' => $keyData['email'] ?? null,
+                    'api_key_data' => $keyData
+                ];
+            }
+        }
+
+        // Anonymous user - check rate limits
+        $clientIp = RateLimit::getClientIp();
+        $limitCheck = RateLimit::checkAnonymous($clientIp);
+
+        if (!$limitCheck['allowed']) {
+            Logger::security('Anonymous rate limit exceeded', [
+                'ip' => $clientIp,
+                'reason' => $limitCheck['reason']
+            ]);
+            Response::json([
+                'error' => 'Rate limit exceeded',
+                'message' => $limitCheck['reason'] === 'hourly_limit_exceeded'
+                    ? "You have exceeded the hourly limit of {$limitCheck['limit']} requests. Please register for higher limits."
+                    : "You have exceeded the daily limit of {$limitCheck['limit']} requests. Please register for higher limits.",
+                'limit' => $limitCheck['limit'],
+                'reset_in_seconds' => $limitCheck['reset_in'],
+                'upgrade_message' => 'Create a free account to get 100 requests per day and 1000 per month.'
+            ], 429);
+            exit;
+        }
+
+        Logger::debug('Anonymous request', [
+            'ip' => $clientIp,
+            'hourly_remaining' => $limitCheck['hourly_remaining'],
+            'daily_remaining' => $limitCheck['daily_remaining']
+        ]);
+
+        return [
+            'authenticated' => false,
+            'user_id' => null,
+            'ip_address' => $clientIp,
+            'rate_limit' => $limitCheck
+        ];
+    }
+
+    /**
+     * Check if a feature/endpoint requires authentication
+     */
+    public static function requiresAuth(string $endpoint): bool {
+        $authRequired = [
+            '/api/v1/verify/malware',
+            '/api/v1/inspect/archive',
+            '/api/v1/verify/id',
+            '/api/v1/verify/file-signature',
+            '/api/v1/webhooks',
+            '/api/v1/billing',
+            '/api/v1/auth/profile',
+            '/api/v1/auth/logout'
+        ];
+
+        foreach ($authRequired as $pattern) {
+            if (str_starts_with($endpoint, $pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function getClientIp(): string {
+        return RateLimit::getClientIp();
     }
 }

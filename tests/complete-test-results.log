@@ -1,0 +1,10 @@
+╔════════════════════════════════════════════════════════════════╗
+║         Complete VeriBits API Endpoint Test Suite            ║
+╚════════════════════════════════════════════════════════════════╝
+
+Testing ALL endpoints from routing configuration...
+
+
+[0;34m━━━ Testing:[0m Health Check (GET https://veribits.com/api/v1/health)
+Status: 200
+[0;32m✅ PASS[0m - Health Check

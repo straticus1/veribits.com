@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS file_signature_checks (
     id SERIAL PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID DEFAULT NULL,
     filename VARCHAR(512) NOT NULL,
     file_size INTEGER NOT NULL,
     file_hash VARCHAR(64) NOT NULL,

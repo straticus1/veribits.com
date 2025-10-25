@@ -1,0 +1,138 @@
+{
+  "family": "veribits-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::515966511618:role/veribits-task-exec",
+  "containerDefinitions": [
+    {
+      "name": "veribits-api",
+      "image": "515966511618.dkr.ecr.us-east-1.amazonaws.com/veribits-api:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "APP_DEBUG",
+          "value": "false"
+        },
+        {
+          "name": "APP_URL",
+          "value": "https://veribits.com"
+        },
+        {
+          "name": "DB_DRIVER",
+          "value": "pgsql"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "nitetext-db.c3iuy64is41m.us-east-1.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "5432"
+        },
+        {
+          "name": "DB_DATABASE",
+          "value": "veribits"
+        },
+        {
+          "name": "DB_USERNAME",
+          "value": "nitetext"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "NiteText2025!SecureProd"
+        },
+        {
+          "name": "JWT_SECRET",
+          "value": "veribits_prod_jwt_hK7mP9xL2nQ5wR8tY1vZ3aC6bN4jM0sD"
+        },
+        {
+          "name": "REDIS_HOST",
+          "value": "veribits-redis.092cyw.0001.use1.cache.amazonaws.com"
+        },
+        {
+          "name": "REDIS_PORT",
+          "value": "6379"
+        },
+        {
+          "name": "REDIS_DATABASE",
+          "value": "0"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "us-east-1"
+        },
+        {
+          "name": "COGNITO_USER_POOL_ID",
+          "value": "us-east-1_wCnSfCwUy"
+        },
+        {
+          "name": "COGNITO_CLIENT_ID",
+          "value": "7pteinmo3h02nbaus926n81h7h"
+        },
+        {
+          "name": "CORS_ALLOWED_ORIGINS",
+          "value": "https://veribits.com,https://www.veribits.com"
+        },
+        {
+          "name": "FORCE_HTTPS",
+          "value": "true"
+        },
+        {
+          "name": "SESSION_SECURE",
+          "value": "true"
+        },
+        {
+          "name": "COOKIE_SECURE",
+          "value": "true"
+        },
+        {
+          "name": "FEATURE_BLOCKCHAIN_VERIFICATION",
+          "value": "true"
+        },
+        {
+          "name": "FEATURE_PREMIUM_FEATURES",
+          "value": "true"
+        },
+        {
+          "name": "RATE_LIMIT_DRIVER",
+          "value": "redis"
+        },
+        {
+          "name": "CACHE_DRIVER",
+          "value": "redis"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "info"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/veribits-api",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost/api/v1/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

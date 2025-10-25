@@ -8,7 +8,9 @@ class Config {
     public static function load(): void {
         if (self::$loaded) return;
 
-        $envFile = __DIR__ . '/../../config/.env';
+        // Correct path for Docker container: /var/www/.env
+        $envFile = __DIR__ . '/../../.env';
+
         if (file_exists($envFile)) {
             $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($lines as $line) {
@@ -17,7 +19,11 @@ class Config {
                 [$key, $value] = explode('=', $line, 2);
                 self::$config[trim($key)] = trim($value);
             }
+        } else {
+            // Fallback to environment variables only
+            error_log('VeriBits: .env file not found at ' . $envFile . ', using environment variables only');
         }
+
         self::$loaded = true;
     }
 

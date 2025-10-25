@@ -85,13 +85,38 @@ class Response {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
         }
 
-        $allowedOrigins = explode(',', Config::get('CORS_ALLOWED_ORIGINS', ''));
+        // CORS handling with proper validation
+        $corsConfig = Config::get('CORS_ALLOWED_ORIGINS', '');
+        $allowedOrigins = array_filter(
+            array_map('trim', explode(',', $corsConfig)),
+            fn($o) => !empty($o)
+        );
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
         if (Config::isDevelopment()) {
+            // Allow all origins in development
             header('Access-Control-Allow-Origin: *');
-        } elseif (!empty($origin) && in_array($origin, $allowedOrigins)) {
-            header("Access-Control-Allow-Origin: $origin");
+        } elseif (!empty($origin) && filter_var($origin, FILTER_VALIDATE_URL)) {
+            // Validate and sanitize origin
+            $parsedOrigin = parse_url($origin);
+            if (isset($parsedOrigin['scheme']) && isset($parsedOrigin['host'])) {
+                $reconstructed = $parsedOrigin['scheme'] . '://' . $parsedOrigin['host'];
+                if (isset($parsedOrigin['port'])) {
+                    $reconstructed .= ':' . $parsedOrigin['port'];
+                }
+
+                if (in_array($reconstructed, $allowedOrigins, true)) {
+                    header("Access-Control-Allow-Origin: $reconstructed");
+                    header('Vary: Origin');
+                    header('Access-Control-Allow-Credentials: true');
+                } else {
+                    Logger::security('CORS origin blocked', [
+                        'origin' => $origin,
+                        'allowed' => $allowedOrigins
+                    ]);
+                    // Don't set CORS headers for disallowed origins
+                }
+            }
         }
 
         header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key, X-Request-ID');
