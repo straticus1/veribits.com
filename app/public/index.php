@@ -41,17 +41,20 @@ use VeriBits\Controllers\FileSignatureController;
 use VeriBits\Controllers\AnonymousLimitsController;
 use VeriBits\Controllers\CryptoValidationController;
 use VeriBits\Controllers\SSLGeneratorController;
+use VeriBits\Controllers\SSLChainResolverController;
 use VeriBits\Controllers\JWTController;
 use VeriBits\Controllers\DeveloperToolsController;
 use VeriBits\Controllers\CodeSigningController;
 use VeriBits\Controllers\ApiKeyController;
 use VeriBits\Controllers\VerificationsController;
 use VeriBits\Controllers\NetworkToolsController;
+use VeriBits\Controllers\AdminController;
 use VeriBits\Controllers\SteganographyController;
 use VeriBits\Controllers\BGPController;
 use VeriBits\Controllers\ToolSearchController;
 use VeriBits\Controllers\CloudStorageController;
 use VeriBits\Controllers\HaveIBeenPwnedController;
+use VeriBits\Controllers\EmailVerificationController;
 
 // Initialize configuration
 Config::load();
@@ -103,6 +106,12 @@ try {
     }
     if ($uri === '/api/v1/auth/refresh' && $method === 'POST') {
         (new AuthController())->refresh();
+        exit;
+    }
+
+    // Admin endpoints
+    if ($uri === '/api/v1/admin/migrate' && $method === 'POST') {
+        (new AdminController())->runMigrations();
         exit;
     }
     if ($uri === '/api/v1/auth/profile' && $method === 'GET') {
@@ -276,6 +285,62 @@ try {
     }
     if ($uri === '/api/v1/ssl/validate-csr' && $method === 'POST') {
         (new SSLGeneratorController())->validateCSR();
+        exit;
+    }
+
+    // SSL Chain Resolver (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/ssl/resolve-chain' && $method === 'POST') {
+        (new SSLChainResolverController())->resolveChain();
+        exit;
+    }
+    if ($uri === '/api/v1/ssl/fetch-missing' && $method === 'POST') {
+        (new SSLChainResolverController())->fetchMissing();
+        exit;
+    }
+    if ($uri === '/api/v1/ssl/build-bundle' && $method === 'POST') {
+        (new SSLChainResolverController())->buildBundle();
+        exit;
+    }
+    if ($uri === '/api/v1/ssl/verify-key-pair' && $method === 'POST') {
+        (new SSLChainResolverController())->verifyKeyPair();
+        exit;
+    }
+
+    // Email Verification Tools (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/email/check-disposable' && $method === 'POST') {
+        (new EmailVerificationController())->checkDisposable();
+        exit;
+    }
+    if ($uri === '/api/v1/email/analyze-spf' && $method === 'POST') {
+        (new EmailVerificationController())->analyzeSPF();
+        exit;
+    }
+    if ($uri === '/api/v1/email/analyze-dkim' && $method === 'POST') {
+        (new EmailVerificationController())->analyzeDKIM();
+        exit;
+    }
+    if ($uri === '/api/v1/email/verify-dkim-signature' && $method === 'POST') {
+        (new EmailVerificationController())->verifyDKIMSignature();
+        exit;
+    }
+    if ($uri === '/api/v1/email/analyze-dmarc' && $method === 'POST') {
+        (new EmailVerificationController())->analyzeDMARC();
+        exit;
+    }
+    if ($uri === '/api/v1/email/analyze-mx' && $method === 'POST') {
+        (new EmailVerificationController())->analyzeMX();
+        exit;
+    }
+    if ($uri === '/api/v1/email/analyze-headers' && $method === 'POST') {
+        (new EmailVerificationController())->analyzeHeaders();
+        exit;
+    }
+    if ($uri === '/api/v1/email/check-blacklists' && $method === 'POST') {
+        (new EmailVerificationController())->checkBlacklists();
+        exit;
+    }
+    if ($uri === '/api/v1/email/deliverability-score' && $method === 'POST') {
+        (new EmailVerificationController())->deliverabilityScore();
         exit;
     }
 

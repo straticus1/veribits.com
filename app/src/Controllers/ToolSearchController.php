@@ -91,6 +91,16 @@ class ToolSearchController {
             'url' => '/tools/ssl-generator'
         ],
         [
+            'id' => 'ssl-chain-resolver',
+            'name' => 'SSL Certificate Chain Resolver',
+            'category' => 'Security',
+            'description' => 'Analyze and resolve SSL certificate chains. Upload certificates or provide a URL to identify missing intermediates/roots. Automatically fetch missing certificates via AIA. Verify private keys match certificates. Download complete chains in PEM, PKCS7, or PKCS12 format.',
+            'endpoint' => '/api/v1/ssl/resolve-chain',
+            'cli_command' => 'veribits ssl:resolve-chain --url example.com',
+            'keywords' => ['ssl', 'certificate', 'chain', 'intermediate', 'root', 'aia', 'resolver', 'pkcs12', 'pkcs7', 'pem', 'pfx', 'p12', 'p7b', 'bundle', 'key verification', 'private key'],
+            'url' => '/tools/ssl-chain-resolver'
+        ],
+        [
             'id' => 'jwt',
             'name' => 'JWT Tools',
             'category' => 'Cryptography',
@@ -181,6 +191,116 @@ class ToolSearchController {
             'cli_command' => 'veribits breach:email user@example.com',
             'keywords' => ['breach', 'hibp', 'haveibeenpwned', 'password', 'email', 'pwned', 'compromised', 'leak', 'security', 'data breach'],
             'url' => '/tools/breach-check'
+        ],
+        [
+            'id' => 'email-verification',
+            'name' => 'Email Verification Suite',
+            'category' => 'Email Security',
+            'description' => 'Comprehensive email verification and deliverability analysis. Check SPF, DKIM, DMARC records, MX configuration, disposable emails, blacklists, and get deliverability scores. Includes SPF and DMARC wizards.',
+            'endpoint' => '/api/v1/email',
+            'cli_command' => 'veribits email:score example.com',
+            'keywords' => ['email', 'spf', 'dkim', 'dmarc', 'mx', 'mail', 'deliverability', 'disposable', 'blacklist', 'rbl', 'postmaster', 'authentication', 'sender', 'verification', 'wizard'],
+            'url' => '/tools/email-verification'
+        ],
+        [
+            'id' => 'email-dea-check',
+            'name' => 'Disposable Email Detector',
+            'category' => 'Email Security',
+            'description' => 'Detect disposable and temporary email addresses to prevent spam and fraud',
+            'endpoint' => '/api/v1/email/check-disposable',
+            'cli_command' => 'veribits email:check-dea user@example.com',
+            'keywords' => ['email', 'disposable', 'temporary', 'dea', 'fake', 'throwaway', 'spam', 'fraud'],
+            'url' => '/tools/email-verification?tab=dea'
+        ],
+        [
+            'id' => 'email-spf',
+            'name' => 'SPF Record Analyzer',
+            'category' => 'Email Security',
+            'description' => 'Analyze Sender Policy Framework (SPF) records and identify authorized mail servers',
+            'endpoint' => '/api/v1/email/analyze-spf',
+            'cli_command' => 'veribits email:spf example.com',
+            'keywords' => ['email', 'spf', 'sender policy framework', 'dns', 'authentication', 'mail server', 'authorization'],
+            'url' => '/tools/email-verification?tab=spf'
+        ],
+        [
+            'id' => 'email-dkim',
+            'name' => 'DKIM Record Analyzer',
+            'category' => 'Email Security',
+            'description' => 'Find and analyze DomainKeys Identified Mail (DKIM) records and selectors',
+            'endpoint' => '/api/v1/email/analyze-dkim',
+            'cli_command' => 'veribits email:dkim example.com',
+            'keywords' => ['email', 'dkim', 'domainkeys', 'authentication', 'signature', 'selector', 'public key'],
+            'url' => '/tools/email-verification?tab=dkim'
+        ],
+        [
+            'id' => 'email-dmarc',
+            'name' => 'DMARC Policy Analyzer',
+            'category' => 'Email Security',
+            'description' => 'Analyze Domain-based Message Authentication, Reporting, and Conformance (DMARC) policies',
+            'endpoint' => '/api/v1/email/analyze-dmarc',
+            'cli_command' => 'veribits email:dmarc example.com',
+            'keywords' => ['email', 'dmarc', 'authentication', 'policy', 'spoofing', 'phishing', 'reporting'],
+            'url' => '/tools/email-verification?tab=dmarc'
+        ],
+        [
+            'id' => 'email-mx',
+            'name' => 'MX Record Analyzer',
+            'category' => 'Email Security',
+            'description' => 'Analyze mail server (MX) records, check TLS support, and verify mail server configuration',
+            'endpoint' => '/api/v1/email/analyze-mx',
+            'cli_command' => 'veribits email:mx example.com',
+            'keywords' => ['email', 'mx', 'mail server', 'dns', 'tls', 'starttls', 'configuration'],
+            'url' => '/tools/email-verification?tab=mx'
+        ],
+        [
+            'id' => 'email-header-analyzer',
+            'name' => 'Email Header Analyzer',
+            'category' => 'Email Security',
+            'description' => 'Parse and analyze email headers to verify authentication (SPF, DKIM, DMARC) and trace routing',
+            'endpoint' => '/api/v1/email/analyze-headers',
+            'cli_command' => 'veribits email:headers',
+            'keywords' => ['email', 'headers', 'parse', 'authentication', 'routing', 'trace', 'received'],
+            'url' => '/tools/email-verification?tab=headers'
+        ],
+        [
+            'id' => 'email-blacklist',
+            'name' => 'Email Blacklist Checker',
+            'category' => 'Email Security',
+            'description' => 'Check if domain or IP address is listed on major email blacklists (RBLs) like Spamhaus, SpamCop, SORBS',
+            'endpoint' => '/api/v1/email/check-blacklists',
+            'cli_command' => 'veribits email:blacklist example.com',
+            'keywords' => ['email', 'blacklist', 'rbl', 'spam', 'spamhaus', 'spamcop', 'sorbs', 'dnsbl'],
+            'url' => '/tools/email-verification?tab=blacklist'
+        ],
+        [
+            'id' => 'email-deliverability',
+            'name' => 'Email Deliverability Score',
+            'category' => 'Email Security',
+            'description' => 'Comprehensive email deliverability analysis combining SPF, DKIM, DMARC, MX, and blacklist checks',
+            'endpoint' => '/api/v1/email/deliverability-score',
+            'cli_command' => 'veribits email:score example.com',
+            'keywords' => ['email', 'deliverability', 'score', 'reputation', 'analysis', 'comprehensive'],
+            'url' => '/tools/email-verification?tab=score'
+        ],
+        [
+            'id' => 'spf-wizard',
+            'name' => 'SPF Record Wizard',
+            'category' => 'Email Security',
+            'description' => 'Interactive wizard to create custom SPF records for your domain',
+            'endpoint' => '/tools/email-verification',
+            'cli_command' => 'veribits email:spf',
+            'keywords' => ['email', 'spf', 'wizard', 'generator', 'create', 'build'],
+            'url' => '/tools/email-verification?tab=spf-wizard'
+        ],
+        [
+            'id' => 'dmarc-wizard',
+            'name' => 'DMARC Policy Wizard',
+            'category' => 'Email Security',
+            'description' => 'Interactive wizard to create custom DMARC policies for your domain',
+            'endpoint' => '/tools/email-verification',
+            'cli_command' => 'veribits email:dmarc',
+            'keywords' => ['email', 'dmarc', 'wizard', 'generator', 'create', 'build', 'policy'],
+            'url' => '/tools/email-verification?tab=dmarc-wizard'
         ],
 
         // Developer Tools

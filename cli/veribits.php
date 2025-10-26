@@ -506,6 +506,466 @@ switch ($cmd) {
         }
         break;
 
+    case 'ssl:resolve-chain':
+        $url = $opts['url'] ?? ($args[0] ?? null);
+        $port = $opts['port'] ?? '443';
+        $file = $opts['file'] ?? null;
+        $format = $opts['format'] ?? 'auto';
+        $password = $opts['password'] ?? null;
+        $json_output = isset($opts['json']);
+
+        if (!$url && !$file) {
+            fwrite(STDERR, "Error: Must provide --url or --file\n");
+            exit(1);
+        }
+
+        if ($file && !file_exists($file)) {
+            fwrite(STDERR, "Error: File not found: $file\n");
+            exit(1);
+        }
+
+        $apiUrl = getenv('VERIBITS_API_URL') ?: 'https://www.veribits.com';
+        $endpoint = "$apiUrl/api/v1/ssl/resolve-chain";
+
+        $ch = curl_init($endpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+
+        if ($file) {
+            $postFields = [
+                'input_type' => $format,
+                'certificate' => new CURLFile($file),
+            ];
+            if ($password) {
+                $postFields['password'] = $password;
+            }
+        } else {
+            $postFields = [
+                'input_type' => 'url',
+                'url' => $url,
+                'port' => $port,
+            ];
+        }
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            $data = json_decode($response, true);
+            $errorMsg = $data['error']['message'] ?? 'Unknown error';
+            fwrite(STDERR, "Error: $errorMsg\n");
+            exit(1);
+        }
+
+        $data = json_decode($response, true);
+        $result = $data['data'] ?? [];
+
+        if ($json_output) {
+            echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+        } else {
+            echo "\n\033[1mSSL Certificate Chain Analysis\033[0m\n\n";
+            echo "Complete: " . ($result['complete'] ? "\033[32mYes\033[0m" : "\033[33mNo\033[0m") . "\n";
+            echo "Chain Length: " . count($result['chain'] ?? []) . " certificate(s)\n";
+            echo "Missing: " . count($result['missing'] ?? []) . " certificate(s)\n\n";
+
+            if (!empty($result['chain'])) {
+                echo "\033[1mCertificate Chain:\033[0m\n\n";
+                foreach ($result['chain'] as $i => $cert) {
+                    $type = ($i === 0) ? 'Leaf Certificate' : (($cert['is_ca'] ?? false) ? 'CA Certificate' : 'Certificate');
+                    echo "  [$i] $type\n";
+                    echo "      Subject: " . ($cert['subject']['CN'] ?? 'N/A') . "\n";
+                    echo "      Issuer:  " . ($cert['issuer']['CN'] ?? 'N/A') . "\n";
+                    echo "      Valid:   " . ($cert['validity']['is_valid'] ? "\033[32mYes\033[0m" : "\033[31mNo\033[0m") . "\n";
+                    if (isset($cert['validity']['days_until_expiry'])) {
+                        $days = $cert['validity']['days_until_expiry'];
+                        $color = $days > 30 ? '32' : ($days > 0 ? '33' : '31');
+                        echo "      Expires: in \033[{$color}m$days days\033[0m\n";
+                    }
+                    echo "\n";
+                }
+            }
+
+            if (!empty($result['missing'])) {
+                echo "\033[1;33mMissing Certificates:\033[0m\n\n";
+                foreach ($result['missing'] as $missing) {
+                    echo "  - Issuer: " . ($missing['issuer_cn'] ?? 'Unknown') . "\n";
+                    if (!empty($missing['aia_urls'])) {
+                        echo "    AIA URLs: " . implode(', ', $missing['aia_urls']) . "\n";
+                    }
+                }
+                echo "\n";
+            }
+        }
+        break;
+
+    case 'ssl:verify-keypair':
+        $certFile = $opts['cert'] ?? null;
+        $keyFile = $opts['key'] ?? null;
+        $json_output = isset($opts['json']);
+
+        if (!$certFile || !$keyFile) {
+            fwrite(STDERR, "Error: Must provide --cert and --key\n");
+            exit(1);
+        }
+
+        if (!file_exists($certFile)) {
+            fwrite(STDERR, "Error: Certificate file not found: $certFile\n");
+            exit(1);
+        }
+
+        if (!file_exists($keyFile)) {
+            fwrite(STDERR, "Error: Key file not found: $keyFile\n");
+            exit(1);
+        }
+
+        $apiUrl = getenv('VERIBITS_API_URL') ?: 'https://www.veribits.com';
+        $endpoint = "$apiUrl/api/v1/ssl/verify-key-pair";
+
+        $ch = curl_init($endpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'certificate' => new CURLFile($certFile),
+            'private_key' => new CURLFile($keyFile),
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            $data = json_decode($response, true);
+            $errorMsg = $data['error']['message'] ?? 'Unknown error';
+            fwrite(STDERR, "Error: $errorMsg\n");
+            exit(1);
+        }
+
+        $data = json_decode($response, true);
+        $result = $data['data'] ?? [];
+
+        if ($json_output) {
+            echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+        } else {
+            echo "\n\033[1mKey Pair Verification\033[0m\n\n";
+            if ($result['match']) {
+                echo "Result: \033[32m✓ MATCH\033[0m\n";
+            } else {
+                echo "Result: \033[31m✗ NO MATCH\033[0m\n";
+            }
+            echo "Method: " . ($result['verification_method'] ?? 'unknown') . "\n\n";
+
+            if (!empty($result['certificate_info'])) {
+                $cert = $result['certificate_info'];
+                echo "\033[1mCertificate Info:\033[0m\n";
+                echo "  Subject: " . ($cert['subject']['CN'] ?? 'N/A') . "\n";
+                echo "  Issuer:  " . ($cert['issuer']['CN'] ?? 'N/A') . "\n";
+                if (isset($cert['validity'])) {
+                    echo "  Valid:   " . ($cert['validity']['is_valid'] ? "\033[32mYes\033[0m" : "\033[31mNo\033[0m") . "\n";
+                }
+                echo "\n";
+            }
+        }
+        break;
+
+    // Email Verification Commands
+    case 'email:check-dea':
+    case 'email:disposable':
+        $email = $args[0] ?? $opts['email'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$email) {
+            fwrite(STDERR, "Error: Email or domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/check-disposable', 'POST', ['email' => $email]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mDisposable Email Check\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+            echo "Domain: " . $data['domain'] . "\n";
+            echo "Disposable: " . ($data['is_disposable'] ? "\033[31mYES\033[0m" : "\033[32mNO\033[0m") . "\n";
+            echo "Risk Level: " . ($data['risk_level'] === 'high' ? "\033[31m" : "\033[32m") . strtoupper($data['risk_level']) . "\033[0m\n";
+            echo "Confidence: " . ucfirst($data['confidence']) . "\n";
+            echo "Recommendation: " . $data['recommendation'] . "\n";
+        }
+        break;
+
+    case 'email:spf':
+    case 'email:analyze-spf':
+        $domain = $args[0] ?? $opts['domain'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$domain) {
+            fwrite(STDERR, "Error: Domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/analyze-spf', 'POST', ['domain' => $domain]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mSPF Record Analysis for $domain\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            if ($data['has_spf']) {
+                echo "\033[32m✓ SPF Record Found\n\033[0m";
+                echo "\nRecord: " . $data['raw_record'] . "\n";
+                echo "Policy Strength: \033[33m" . strtoupper($data['policy_strength']) . "\033[0m\n";
+                echo "DNS Lookups: " . $data['dns_lookups'] . "/10\n";
+                echo "All Mechanism: " . ($data['all_mechanism'] ?: 'None') . "\n";
+
+                if (!empty($data['warnings'])) {
+                    echo "\n\033[33mWarnings:\n\033[0m";
+                    foreach ($data['warnings'] as $warning) {
+                        echo "  ⚠ $warning\n";
+                    }
+                }
+            } else {
+                echo "\033[31m✗ No SPF Record Found\n\033[0m";
+                echo $data['recommendation'] . "\n";
+            }
+        }
+        break;
+
+    case 'email:dkim':
+    case 'email:analyze-dkim':
+        $domain = $args[0] ?? $opts['domain'] ?? '';
+        $selector = $opts['selector'] ?? 'default';
+        $json_output = isset($opts['json']);
+
+        if (!$domain) {
+            fwrite(STDERR, "Error: Domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/analyze-dkim', 'POST', ['domain' => $domain, 'selector' => $selector]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mDKIM Record Analysis for $domain\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            if ($data['has_dkim']) {
+                echo "\033[32m✓ Found {$data['records_found']} DKIM Record(s)\n\033[0m";
+                foreach ($data['records'] as $record) {
+                    echo "\nSelector: " . $record['selector'] . "\n";
+                    echo "Key Type: " . $record['parsed']['key_type'] . "\n";
+                    echo "Hash Algorithms: " . $record['parsed']['hash_algorithms'] . "\n";
+                }
+            } else {
+                echo "\033[33m⚠ No DKIM Records Found\n\033[0m";
+                echo $data['recommendation'] . "\n";
+            }
+        }
+        break;
+
+    case 'email:dmarc':
+    case 'email:analyze-dmarc':
+        $domain = $args[0] ?? $opts['domain'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$domain) {
+            fwrite(STDERR, "Error: Domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/analyze-dmarc', 'POST', ['domain' => $domain]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mDMARC Policy Analysis for $domain\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            if ($data['has_dmarc']) {
+                echo "\033[32m✓ DMARC Record Found\n\033[0m";
+                echo "\nRecord: " . $data['raw_record'] . "\n";
+                echo "Policy: \033[33m" . strtoupper($data['policy']) . "\033[0m\n";
+                echo "Policy Strength: " . strtoupper($data['policy_strength']) . "\n";
+                echo "Percentage: " . $data['percentage'] . "%\n";
+                echo "DKIM Alignment: " . ($data['alignment']['dkim'] === 'r' ? 'Relaxed' : 'Strict') . "\n";
+                echo "SPF Alignment: " . ($data['alignment']['spf'] === 'r' ? 'Relaxed' : 'Strict') . "\n";
+
+                if (!empty($data['recommendations'])) {
+                    echo "\nRecommendations:\n";
+                    foreach ($data['recommendations'] as $rec) {
+                        echo "  • $rec\n";
+                    }
+                }
+            } else {
+                echo "\033[31m✗ No DMARC Record Found\n\033[0m";
+                echo $data['recommendation'] . "\n";
+            }
+        }
+        break;
+
+    case 'email:mx':
+    case 'email:analyze-mx':
+        $domain = $args[0] ?? $opts['domain'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$domain) {
+            fwrite(STDERR, "Error: Domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/analyze-mx', 'POST', ['domain' => $domain]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mMX Record Analysis for $domain\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            if ($data['has_mx']) {
+                echo "\033[32m✓ Found {$data['mx_count']} MX Record(s)\n\033[0m";
+                echo "Redundancy: " . ($data['redundancy'] ? 'Yes' : 'No') . "\n\n";
+
+                foreach ($data['records'] as $mx) {
+                    echo "Hostname: " . $mx['hostname'] . "\n";
+                    echo "Priority: " . $mx['priority'] . "\n";
+                    echo "TLS Support: " . ($mx['supports_tls'] ? "\033[32mYes\033[0m" : "\033[31mNo\033[0m") . "\n";
+                    if (!empty($mx['ip_addresses'])) {
+                        echo "IPs: " . implode(', ', $mx['ip_addresses']) . "\n";
+                    }
+                    echo "\n";
+                }
+            } else {
+                echo "\033[31m✗ No MX Records Found\n\033[0m";
+                echo "This domain cannot receive email\n";
+            }
+        }
+        break;
+
+    case 'email:blacklist':
+    case 'email:check-blacklist':
+        $query = $args[0] ?? $opts['query'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$query) {
+            fwrite(STDERR, "Error: Domain or IP address required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/check-blacklists', 'POST', ['query' => $query]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mBlacklist Check for $query\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            if ($data['is_blacklisted']) {
+                echo "\033[31m✗ Listed on {$data['blacklists_listed']} Blacklist(s)\n\033[0m";
+                echo "Severity: " . strtoupper($data['severity']) . "\n\n";
+
+                foreach ($data['results'] as $rbl) {
+                    if ($rbl['listed']) {
+                        echo "\033[31m  ✗ \033[0m" . $rbl['rbl'] . "\n";
+                    }
+                }
+            } else {
+                echo "\033[32m✓ Not Blacklisted\n\033[0m";
+                echo "Checked {$data['blacklists_checked']} blacklists\n";
+            }
+
+            echo "\n" . $data['recommendation'] . "\n";
+        }
+        break;
+
+    case 'email:score':
+    case 'email:deliverability':
+        $domain = $args[0] ?? $opts['domain'] ?? '';
+        $json_output = isset($opts['json']);
+
+        if (!$domain) {
+            fwrite(STDERR, "Error: Domain required\n");
+            exit(1);
+        }
+
+        $result = apiRequest('/api/v1/email/deliverability-score', 'POST', ['domain' => $domain]);
+
+        if (!$result || !$result['success']) {
+            fwrite(STDERR, "Error: " . ($result['error'] ?? 'Unknown error') . "\n");
+            exit(1);
+        }
+
+        $data = $result['data'];
+
+        if ($json_output) {
+            echo json_encode($data, JSON_PRETTY_PRINT) . "\n";
+        } else {
+            echo "\n\033[36mEmail Deliverability Score for $domain\n\033[0m";
+            echo str_repeat('=', 50) . "\n";
+
+            $gradeColors = ['A' => '32', 'B' => '36', 'C' => '33', 'D' => '31', 'F' => '31'];
+            $gradeColor = $gradeColors[$data['grade']] ?? '37';
+            echo "Overall Grade: \033[{$gradeColor}m{$data['grade']}\033[0m\n";
+            echo "Score: {$data['score']}/{$data['max_score']} ({$data['percentage']}%)\n\n";
+
+            foreach ($data['factors'] as $factor) {
+                $status = $factor['status'] === 'pass' ? "\033[32m✓\033[0m" : "\033[31m✗\033[0m";
+                echo "$status " . $factor['name'] . ": {$factor['score']}/{$factor['max']}\n";
+            }
+
+            if (!empty($data['summary'])) {
+                echo "\nRecommendations:\n";
+                foreach ($data['summary'] as $rec) {
+                    echo "  • $rec\n";
+                }
+            }
+        }
+        break;
+
     case 'help':
     default:
         echo "VeriBits CLI - Trust Verification Tools\n\n";
@@ -516,6 +976,16 @@ switch ($cmd) {
         echo "  verify:email --email=<email>               Verify email address\n";
         echo "  verify:tx --network=<network> --tx=<hash>  Verify transaction\n";
         echo "  health                                      Check API health\n\n";
+        echo "SSL/TLS Certificate Tools:\n";
+        echo "  ssl:resolve-chain <url|--file=path>        Resolve certificate chain\n";
+        echo "    --url=<domain>                           Domain to check (e.g., google.com)\n";
+        echo "    --port=<num>                             Port (default: 443)\n";
+        echo "    --file=<path>                            Certificate file to analyze\n";
+        echo "    --format=<type>                          Format (pem|pkcs12|pkcs7|auto)\n";
+        echo "    --password=<pass>                        Password for PKCS12 files\n";
+        echo "    --json                                   Output as JSON\n";
+        echo "  ssl:verify-keypair --cert=<path> --key=<path>  Verify key matches certificate\n";
+        echo "    --json                                   Output as JSON\n\n";
         echo "Data Breach Checking (Have I Been Pwned):\n";
         echo "  breach:email <email>                       Check if email in breaches\n";
         echo "  breach:password <password>                 Check if password compromised\n";
@@ -528,6 +998,15 @@ switch ($cmd) {
         echo "  tool-list                                  List all available tools\n";
         echo "    --verbose, -v                            Show detailed info\n";
         echo "    --json                                   Output as JSON\n\n";
+        echo "Email Verification Tools:\n";
+        echo "  email:check-dea <email>                    Check if email is disposable\n";
+        echo "  email:spf <domain>                         Analyze SPF record\n";
+        echo "  email:dkim <domain> [--selector=<name>]    Analyze DKIM records\n";
+        echo "  email:dmarc <domain>                       Analyze DMARC policy\n";
+        echo "  email:mx <domain>                          Analyze MX records\n";
+        echo "  email:blacklist <domain|ip>                Check email blacklists\n";
+        echo "  email:score <domain>                       Get deliverability score\n";
+        echo "    --json                                   Output as JSON\n\n";
         echo "Cloud Storage Security:\n";
         echo "  cloud-storage <query> [options]            Search cloud storage\n";
         echo "    --provider=<name>                        Provider (aws|gcs|azure|digitalocean|all)\n";
@@ -537,6 +1016,9 @@ switch ($cmd) {
         echo "  cloud-storage-buckets --provider=<name>    List buckets/containers\n";
         echo "    --json                                   Output as JSON\n\n";
         echo "Examples:\n";
+        echo "  veribits ssl:resolve-chain google.com      Analyze Google's SSL certificate chain\n";
+        echo "  veribits ssl:resolve-chain --file=cert.pem Analyze certificate from file\n";
+        echo "  veribits ssl:verify-keypair --cert=site.crt --key=site.key  Verify key pair\n";
         echo "  veribits breach:email user@example.com     Check email for breaches\n";
         echo "  veribits breach:password MyPassword123     Check password security\n";
         echo "  veribits tool-search dns                   Search for DNS tools\n";

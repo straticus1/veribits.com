@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     tar \
     bzip2 \
     xz-utils \
+    postgresql-client \
     && docker-php-ext-install pdo pdo_pgsql zip \
     && pecl install redis-5.3.7 \
     && docker-php-ext-enable redis \
@@ -49,6 +50,11 @@ RUN cd /tmp && \
 COPY app/public/ /var/www/html/
 COPY app/src/ /var/www/src/
 COPY app/config/.env.example /var/www/.env
+
+# Copy database migrations and scripts
+COPY db/migrations/ /var/www/db/migrations/
+COPY scripts/run-migrations.sh /var/www/scripts/run-migrations.sh
+RUN chmod +x /var/www/scripts/run-migrations.sh
 
 # Copy whitelist configuration
 COPY config/whitelist.json /tmp/access_veribits.json
