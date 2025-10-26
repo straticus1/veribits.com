@@ -114,6 +114,10 @@ try {
         (new AdminController())->runMigrations();
         exit;
     }
+    if ($uri === '/api/v1/admin/test-register' && $method === 'POST') {
+        (new AdminController())->testRegister();
+        exit;
+    }
     if ($uri === '/api/v1/auth/profile' && $method === 'GET') {
         (new AuthController())->profile();
         exit;

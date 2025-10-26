@@ -6,6 +6,35 @@ use VeriBits\Utils\Database;
 use VeriBits\Utils\Logger;
 
 class AdminController {
+    public function testRegister(): void {
+        try {
+            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $email = $body['email'] ?? 'test@test.com';
+            $password = $body['password'] ?? 'Password@123';
+
+            // Test hash
+            $hash = password_hash($password, PASSWORD_ARGON2ID);
+
+            // Test API key
+            $apiKey = 'vb_' . bin2hex(random_bytes(24));
+
+            // Test database insert
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("INSERT INTO users (email, password, status) VALUES (:email, :password, 'active') RETURNING id");
+            $stmt->execute(['email' => $email, 'password' => $hash]);
+            $userId = $stmt->fetchColumn();
+
+            Response::success([
+                'user_id' => $userId,
+                'api_key' => $apiKey,
+                'hash_length' => strlen($hash)
+            ], 'Debug registration successful');
+
+        } catch (\Exception $e) {
+            Response::error('Debug error: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ':' . $e->getLine(), 500);
+        }
+    }
+
     public function runMigrations(): void {
         try {
             $results = [];
