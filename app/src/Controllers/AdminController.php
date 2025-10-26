@@ -20,8 +20,8 @@ class AdminController {
 
             // Test database insert
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare("INSERT INTO users (email, password, status) VALUES (:email, :password, 'active') RETURNING id");
-            $stmt->execute(['email' => $email, 'password' => $hash]);
+            $stmt = $pdo->prepare("INSERT INTO users (email, password_hash, status) VALUES (:email, :password_hash, 'active') RETURNING id");
+            $stmt->execute(['email' => $email, 'password_hash' => $hash]);
             $userId = $stmt->fetchColumn();
 
             Response::success([

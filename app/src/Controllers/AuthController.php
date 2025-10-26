@@ -41,7 +41,7 @@ class AuthController {
             $passwordHash = Auth::hashPassword($password);
             $userId = Database::insert('users', [
                 'email' => $email,
-                'password' => $passwordHash,
+                'password_hash' => $passwordHash,
                 'status' => 'active'
             ]);
 
@@ -108,11 +108,11 @@ class AuthController {
 
         try {
             $user = Database::fetch(
-                "SELECT id, email, password, status FROM users WHERE email = :email",
+                "SELECT id, email, password_hash, status FROM users WHERE email = :email",
                 ['email' => $email]
             );
 
-            if (!$user || !Auth::verifyPassword($password, $user['password'])) {
+            if (!$user || !Auth::verifyPassword($password, $user['password_hash'])) {
                 Logger::security('Failed login attempt', [
                     'email' => $email,
                     'ip' => $clientIp
