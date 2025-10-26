@@ -45,30 +45,36 @@ class AdminController {
 
             foreach ($tables as $name => $sql) {
                 try {
-                    $pdo->exec($sql);
+                    // Split by semicolon and execute each statement separately
+                    $statements = array_filter(array_map('trim', explode(';', $sql)));
+                    foreach ($statements as $stmt) {
+                        if (!empty($stmt)) {
+                            try {
+                                $pdo->exec($stmt);
+                            } catch (\PDOException $e) {
+                                // Ignore "already exists" and "duplicate column" errors
+                                if (strpos($e->getMessage(), 'already exists') === false &&
+                                    strpos($e->getMessage(), 'duplicate column') === false) {
+                                    throw $e;
+                                }
+                            }
+                        }
+                    }
                     $results[] = [
                         'table' => $name,
                         'status' => 'success'
                     ];
                     Logger::info('Table created/updated successfully', ['table' => $name]);
                 } catch (\Exception $e) {
-                    // Ignore "already exists" errors
-                    if (strpos($e->getMessage(), 'already exists') === false) {
-                        $results[] = [
-                            'table' => $name,
-                            'status' => 'error',
-                            'message' => $e->getMessage()
-                        ];
-                        Logger::error('Table creation failed', [
-                            'table' => $name,
-                            'error' => $e->getMessage()
-                        ]);
-                    } else {
-                        $results[] = [
-                            'table' => $name,
-                            'status' => 'exists'
-                        ];
-                    }
+                    $results[] = [
+                        'table' => $name,
+                        'status' => 'error',
+                        'message' => $e->getMessage()
+                    ];
+                    Logger::error('Table creation failed', [
+                        'table' => $name,
+                        'error' => $e->getMessage()
+                    ]);
                 }
             }
 
