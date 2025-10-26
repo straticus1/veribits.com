@@ -11,12 +11,12 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/cli.html">CLI</a></li>
-                <li><a href="/pricing.html">Pricing</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/login.html">Login</a></li>
-                <li><a href="/signup.html" class="btn btn-primary">Sign Up</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/login.php">Login</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
             </ul>
         </div>
     </nav>
@@ -222,7 +222,7 @@ veribits ethereum 0x742d35Cc...</code></pre>
                 <h2 style="color: var(--primary-color); margin-bottom: 1rem;">🔑 Authentication</h2>
                 <p style="margin-bottom: 1rem;">For unlimited usage and advanced features, set your API key:</p>
                 <pre style="background: var(--darker-bg); padding: 1.5rem; border-radius: 8px; overflow-x: auto; border-left: 3px solid var(--accent-color);"><code style="color: var(--accent-color);">export VERIBITS_API_KEY="your-api-key-here"</code></pre>
-                <p style="margin-top: 1rem;">Get your API key at: <a href="/dashboard.html" style="color: var(--primary-color);">veribits.com/dashboard</a></p>
+                <p style="margin-top: 1rem;">Get your API key at: <a href="/dashboard.php" style="color: var(--primary-color);">veribits.com/dashboard</a></p>
             </div>
 
             <!-- Usage Limits -->
@@ -248,7 +248,7 @@ veribits ethereum 0x742d35Cc...</code></pre>
                     </div>
                 </div>
                 <p style="margin-top: 1.5rem; text-align: center;">
-                    <a href="/pricing.html" class="btn btn-primary">View Pricing Plans</a>
+                    <a href="/pricing.php" class="btn btn-primary">View Pricing Plans</a>
                 </p>
             </div>
 
@@ -516,9 +516,9 @@ COPY ./src /app/src
                 A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
             </p>
             <p style="margin-top: 1rem;">
-                <a href="/privacy.html" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
-                <a href="/terms.html" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
-                <a href="/support.html" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
             </p>
         </div>
     </footer>

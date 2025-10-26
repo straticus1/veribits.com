@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - VeriBits</title>
+    <title>Login - VeriBits</title>
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
@@ -11,42 +11,40 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/cli.html">CLI</a></li>
-                <li><a href="/pricing.html">Pricing</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/login.html">Login</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="form-container">
-        <h1 style="text-align: center; margin-bottom: 2rem;">Create Your Account</h1>
+        <h1 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h1>
 
         <div id="alert-container"></div>
 
-        <form id="signup-form">
+        <form id="login-form">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" required value="testuser@veribits.com">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required minlength="8">
-                <small style="color: var(--text-secondary);">Minimum 8 characters</small>
+                <input type="password" id="password" name="password" required>
             </div>
 
-            <div class="form-group">
-                <label for="confirm-password">Confirm Password</label>
-                <input type="password" id="confirm-password" name="confirm-password" required>
+            <div style="text-align: right; margin-bottom: 1rem;">
+                <a href="/reset-password.php" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">Forgot password?</a>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
         </form>
 
         <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Or sign up with</p>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Or log in with</p>
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <button class="btn btn-secondary" onclick="socialLogin('google')">🔍 Google</button>
                 <button class="btn btn-secondary" onclick="socialLogin('github')">🐙 GitHub</button>
@@ -54,7 +52,7 @@
         </div>
 
         <p style="text-align: center; margin-top: 2rem; color: var(--text-secondary);">
-            Already have an account? <a href="/login.html" style="color: var(--primary-color);">Log in</a>
+            Don't have an account? <a href="/signup.php" style="color: var(--primary-color);">Sign up</a>
         </p>
     </div>
 

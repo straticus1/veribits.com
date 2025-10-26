@@ -11,9 +11,9 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/dashboard.html">Dashboard</a></li>
-                <li><a href="/settings.html">Settings</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/dashboard.php">Dashboard</a></li>
+                <li><a href="/settings.php">Settings</a></li>
                 <li><a href="#" onclick="logout()">Logout</a></li>
             </ul>
         </div>
@@ -55,10 +55,10 @@
             <div class="feature-card">
                 <h2 style="margin-bottom: 1rem;">Quick Actions</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <a href="/tool/file-magic.html" class="btn btn-primary">File Magic Scan</a>
-                    <a href="/tool/file-signature.html" class="btn btn-primary">Verify Signature</a>
-                    <a href="/tools.html" class="btn btn-secondary">All Tools</a>
-                    <a href="/settings.html" class="btn btn-secondary">Settings</a>
+                    <a href="/tool/file-magic.php" class="btn btn-primary">File Magic Scan</a>
+                    <a href="/tool/file-signature.php" class="btn btn-primary">Verify Signature</a>
+                    <a href="/tools.php" class="btn btn-secondary">All Tools</a>
+                    <a href="/settings.php" class="btn btn-secondary">Settings</a>
                 </div>
             </div>
         </div>
@@ -71,9 +71,9 @@
                 A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
             </p>
             <p style="margin-top: 1rem;">
-                <a href="/privacy.html" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
-                <a href="/terms.html" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
-                <a href="/support.html" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
             </p>
         </div>
     </footer>

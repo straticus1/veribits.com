@@ -1,563 +1,354 @@
-<?php
-// © After Dark Systems
-declare(strict_types=1);
-error_reporting(E_ALL);
-ini_set('display_errors', '0');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriBits - Advanced File Verification & Security Tools</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">VeriBits</a>
+            <ul>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/login.php">Login</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
 
-// Autoload all classes
-spl_autoload_register(function ($class) {
-    $prefix = 'VeriBits\\';
-    $base_dir = __DIR__ . '/../src/';
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Verify. Validate. Trust.</h1>
+            <p>Professional file verification and cryptographic validation tools for developers, security professionals, and businesses.</p>
+            <div class="hero-buttons">
+                <a href="/signup.php" class="btn btn-primary">Start Free Trial</a>
+                <a href="/tools.php" class="btn btn-secondary">Explore Tools</a>
+                <a href="#demo" class="btn btn-secondary" style="background: transparent; border: 2px solid var(--primary-color);">Try Live Demo</a>
+            </div>
+            <p style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.95rem;">
+                ✓ 5 Free Scans  ✓ No Credit Card Required  ✓ 50MB File Limit
+            </p>
+        </div>
+    </section>
 
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
-    }
+    <section class="features">
+        <div class="container">
+            <h2>Powerful Verification Tools</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>File Magic Detection</h3>
+                    <p>Identify file types by analyzing magic numbers and headers. Detect 40+ file formats instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h3>Signature Verification</h3>
+                    <p>Verify PGP, JAR, AIR, and macOS code signatures. Validate file authenticity and integrity.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Hash Validation</h3>
+                    <p>Compare file hashes (MD5, SHA-1, SHA-256, SHA-512) to verify file integrity.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3>Steganography Detection</h3>
+                    <p>Detect hidden data in images and files. Identify potential steganographic content.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔑</div>
+                    <h3>PGP Key Validation</h3>
+                    <p>Validate PGP public keys, check expiration, and verify key fingerprints.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>DNS & IP Tools</h3>
+                    <p>DNS validation, IP address calculations, and network security analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Base64 Encoder/Decoder</h3>
+                    <p>Encode and decode Base64 data for various applications and protocols.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast & Secure</h3>
+                    <p>Enterprise-grade infrastructure with SSL encryption and instant results.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    <!-- Live Demo Section -->
+    <section id="demo" style="padding: 4rem 2rem; background: linear-gradient(180deg, rgba(30, 64, 175, 0.1) 0%, rgba(30, 64, 175, 0.05) 100%);">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem;">Try It Live</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 1.1rem;">
+                No signup required - test our tools right now
+            </p>
 
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto;">
+                <!-- JWT Demo -->
+                <div class="feature-card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">🔑 JWT Decoder</h3>
+                    <textarea id="demo-jwt" rows="4" style="width: 100%; padding: 0.75rem; background: var(--darker-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: monospace; font-size: 0.9rem; resize: vertical;" placeholder="Paste JWT token here...">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</textarea>
+                    <button onclick="decodeJWTDemo()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Decode JWT</button>
+                    <div id="jwt-result" style="margin-top: 1rem; padding: 1rem; background: var(--darker-bg); border-radius: 4px; display: none;">
+                        <pre id="jwt-output" style="margin: 0; color: var(--accent-color); font-size: 0.85rem; white-space: pre-wrap;"></pre>
+                    </div>
+                </div>
 
-use VeriBits\Utils\Response;
-use VeriBits\Utils\Logger;
-use VeriBits\Utils\Config;
-use VeriBits\Controllers\HealthController;
-use VeriBits\Controllers\VerifyController;
-use VeriBits\Controllers\BadgeController;
-use VeriBits\Controllers\AuthController;
-use VeriBits\Controllers\WebhookController;
-use VeriBits\Controllers\BillingController;
-use VeriBits\Controllers\MalwareScanController;
-use VeriBits\Controllers\ArchiveInspectionController;
-use VeriBits\Controllers\DNSCheckController;
-use VeriBits\Controllers\SSLCheckController;
-use VeriBits\Controllers\IDVerificationController;
-use VeriBits\Controllers\FileMagicController;
-use VeriBits\Controllers\FileSignatureController;
-use VeriBits\Controllers\AnonymousLimitsController;
-use VeriBits\Controllers\CryptoValidationController;
-use VeriBits\Controllers\SSLGeneratorController;
-use VeriBits\Controllers\SSLChainResolverController;
-use VeriBits\Controllers\JWTController;
-use VeriBits\Controllers\DeveloperToolsController;
-use VeriBits\Controllers\CodeSigningController;
-use VeriBits\Controllers\ApiKeyController;
-use VeriBits\Controllers\VerificationsController;
-use VeriBits\Controllers\NetworkToolsController;
-use VeriBits\Controllers\AdminController;
-use VeriBits\Controllers\SteganographyController;
-use VeriBits\Controllers\BGPController;
-use VeriBits\Controllers\ToolSearchController;
-use VeriBits\Controllers\CloudStorageController;
-use VeriBits\Controllers\HaveIBeenPwnedController;
-use VeriBits\Controllers\EmailVerificationController;
+                <!-- Crypto Validator Demo -->
+                <div class="feature-card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">₿ Crypto Validator</h3>
+                    <input type="text" id="demo-crypto" style="width: 100%; padding: 0.75rem; background: var(--darker-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: monospace;" placeholder="Bitcoin or Ethereum address..." value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button onclick="validateCrypto('bitcoin')" class="btn btn-secondary" style="flex: 1;">Bitcoin</button>
+                        <button onclick="validateCrypto('ethereum')" class="btn btn-secondary" style="flex: 1;">Ethereum</button>
+                    </div>
+                    <div id="crypto-result" style="margin-top: 1rem; padding: 1rem; background: var(--darker-bg); border-radius: 4px; display: none;">
+                        <div id="crypto-output"></div>
+                    </div>
+                </div>
 
-// Initialize configuration
-Config::load();
+                <!-- Regex Tester Demo -->
+                <div class="feature-card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">🔤 Regex Tester</h3>
+                    <input type="text" id="demo-regex" style="width: 100%; padding: 0.75rem; background: var(--darker-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: monospace; margin-bottom: 0.5rem;" placeholder="Regex pattern..." value="\d{3}-\d{3}-\d{4}">
+                    <textarea id="demo-regex-text" rows="3" style="width: 100%; padding: 0.75rem; background: var(--darker-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); resize: vertical;" placeholder="Test text...">Call me at 555-123-4567 or 555-987-6543</textarea>
+                    <button onclick="testRegexDemo()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Test Regex</button>
+                    <div id="regex-result" style="margin-top: 1rem; padding: 1rem; background: var(--darker-bg); border-radius: 4px; display: none;">
+                        <div id="regex-output"></div>
+                    </div>
+                </div>
+            </div>
 
-// Handle CORS preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    Response::json([]);
-    exit;
-}
+            <div style="text-align: center; margin-top: 3rem;">
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Want access to all 18+ tools?</p>
+                <a href="/signup.php" class="btn btn-primary" style="padding: 0.75rem 2rem;">Start Free Trial</a>
+            </div>
+        </div>
+    </section>
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$method = $_SERVER['REQUEST_METHOD'];
+    <script>
+        async function decodeJWTDemo() {
+            const token = document.getElementById('demo-jwt').value.trim();
+            const resultDiv = document.getElementById('jwt-result');
+            const outputDiv = document.getElementById('jwt-output');
 
-// Only handle API requests - let Apache serve static files
-if (strpos($uri, '/api/') !== 0) {
-    http_response_code(404);
-    exit;
-}
+            if (!token) {
+                alert('Please enter a JWT token');
+                return;
+            }
 
-try {
-    // Health check (no auth required)
-    if ($uri === '/api/v1/health' && $method === 'GET') {
-        (new HealthController())->status();
-        exit;
-    }
+            try {
+                const response = await fetch('/api/v1/jwt/decode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, verify_signature: false })
+                });
 
-    // Anonymous limits info (no auth required)
-    if ($uri === '/api/v1/limits/anonymous' && $method === 'GET') {
-        (new AnonymousLimitsController())->getLimits();
-        exit;
-    }
+                const result = await response.json();
 
-    // Authentication endpoints
-    if ($uri === '/api/v1/auth/register' && $method === 'POST') {
-        (new AuthController())->register();
-        exit;
-    }
-    if ($uri === '/api/v1/auth/login' && $method === 'POST') {
-        (new AuthController())->login();
-        exit;
-    }
-    if ($uri === '/api/v1/auth/logout' && $method === 'POST') {
-        (new AuthController())->logout();
-        exit;
-    }
-    if ($uri === '/api/v1/auth/token' && $method === 'POST') {
-        (new AuthController())->token();
-        exit;
-    }
-    if ($uri === '/api/v1/auth/refresh' && $method === 'POST') {
-        (new AuthController())->refresh();
-        exit;
-    }
+                if (result.success) {
+                    const data = result.data;
+                    const output = {
+                        header: data.header,
+                        payload: data.payload,
+                        claims: data.claims
+                    };
+                    outputDiv.textContent = JSON.stringify(output, null, 2);
+                    resultDiv.style.display = 'block';
+                } else {
+                    outputDiv.textContent = '❌ Error: ' + result.error.message;
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                outputDiv.textContent = '❌ Error: ' + error.message;
+                resultDiv.style.display = 'block';
+            }
+        }
 
-    // Admin endpoints
-    if ($uri === '/api/v1/admin/migrate' && $method === 'POST') {
-        (new AdminController())->runMigrations();
-        exit;
-    }
-    if ($uri === '/api/v1/admin/test-register' && $method === 'POST') {
-        (new AdminController())->testRegister();
-        exit;
-    }
-    if ($uri === '/api/v1/admin/reset-password' && $method === 'POST') {
-        (new AdminController())->resetPassword();
-        exit;
-    }
-    if ($uri === '/api/v1/auth/profile' && $method === 'GET') {
-        (new AuthController())->profile();
-        exit;
-    }
+        async function validateCrypto(type) {
+            const address = document.getElementById('demo-crypto').value.trim();
+            const resultDiv = document.getElementById('crypto-result');
+            const outputDiv = document.getElementById('crypto-output');
 
-    // Verification endpoints (protected)
-    if ($uri === '/api/v1/verify/file' && $method === 'POST') {
-        (new VerifyController())->file();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/email' && $method === 'POST') {
-        (new VerifyController())->email();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/tx' && $method === 'POST') {
-        (new VerifyController())->transaction();
-        exit;
-    }
+            if (!address) {
+                alert('Please enter a cryptocurrency address');
+                return;
+            }
 
-    // Malware scan endpoint (protected)
-    if ($uri === '/api/v1/verify/malware' && $method === 'POST') {
-        (new MalwareScanController())->scan();
-        exit;
-    }
+            try {
+                const response = await fetch(`/api/v1/crypto/validate/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: address, type: 'address' })
+                });
 
-    // Archive inspection endpoint (protected)
-    if ($uri === '/api/v1/inspect/archive' && $method === 'POST') {
-        (new ArchiveInspectionController())->inspect();
-        exit;
-    }
+                const result = await response.json();
 
-    // DNS check endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/dns/check' && $method === 'POST') {
-        (new DNSCheckController())->check();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/dns' && $method === 'POST') {
-        (new DNSCheckController())->check();
-        exit;
-    }
+                if (result.success) {
+                    const data = result.data;
+                    const isValid = data.is_valid;
+                    outputDiv.innerHTML = `
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">${isValid ? '✅' : '❌'}</div>
+                        <div style="color: ${isValid ? 'var(--accent-color)' : '#ef4444'}; font-weight: bold; margin-bottom: 0.5rem;">
+                            ${isValid ? 'Valid' : 'Invalid'} ${type.charAt(0).toUpperCase() + type.slice(1)} Address
+                        </div>
+                        ${data.format ? `<div style="color: var(--text-secondary); font-size: 0.9rem;">Format: ${data.format}</div>` : ''}
+                        ${data.network ? `<div style="color: var(--text-secondary); font-size: 0.9rem;">Network: ${data.network}</div>` : ''}
+                    `;
+                    resultDiv.style.display = 'block';
+                } else {
+                    outputDiv.innerHTML = '<div style="color: #ef4444;">❌ Error: ' + result.error.message + '</div>';
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                outputDiv.innerHTML = '<div style="color: #ef4444;">❌ Error: ' + error.message + '</div>';
+                resultDiv.style.display = 'block';
+            }
+        }
 
-    // SSL check endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/ssl/validate' && $method === 'POST') {
-        (new SSLCheckController())->validate();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/ssl/website' && $method === 'POST') {
-        (new SSLCheckController())->checkWebsite();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/ssl/certificate' && $method === 'POST') {
-        (new SSLCheckController())->checkCertificate();
-        exit;
-    }
-    if ($uri === '/api/v1/verify/ssl/key-match' && $method === 'POST') {
-        (new SSLCheckController())->verifyKeyMatch();
-        exit;
-    }
+        async function testRegexDemo() {
+            const pattern = document.getElementById('demo-regex').value.trim();
+            const text = document.getElementById('demo-regex-text').value;
+            const resultDiv = document.getElementById('regex-result');
+            const outputDiv = document.getElementById('regex-output');
 
-    // ID verification endpoint (protected)
-    if ($uri === '/api/v1/verify/id' && $method === 'POST') {
-        (new IDVerificationController())->verify();
-        exit;
-    }
+            if (!pattern) {
+                alert('Please enter a regex pattern');
+                return;
+            }
 
-    // File magic number analysis endpoint (protected)
-    if ($uri === '/api/v1/file-magic' && $method === 'POST') {
-        (new FileMagicController())->analyze();
-        exit;
-    }
+            try {
+                const response = await fetch('/api/v1/tools/regex-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pattern, text, flags: 'g' })
+                });
 
-    // File signature verification endpoint (protected)
-    if ($uri === '/api/v1/verify/file-signature' && $method === 'POST') {
-        (new FileSignatureController())->verify();
-        exit;
-    }
+                const result = await response.json();
 
-    // Badge endpoints
-    if (preg_match('#^/api/v1/badge/(.+)$#', $uri, $m) && $method === 'GET') {
-        (new BadgeController())->get($m[1]);
-        exit;
-    }
-    if ($uri === '/api/v1/lookup' && $method === 'GET') {
-        (new BadgeController())->lookup();
-        exit;
-    }
+                if (result.success) {
+                    const data = result.data;
+                    let html = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Matches Found:</strong> <span style="color: var(--primary-color);">${data.match_count}</span>
+                        </div>
+                    `;
 
-    // Webhook endpoints (protected)
-    if ($uri === '/api/v1/webhooks' && $method === 'POST') {
-        (new WebhookController())->register();
-        exit;
-    }
-    if ($uri === '/api/v1/webhooks' && $method === 'GET') {
-        (new WebhookController())->list();
-        exit;
-    }
-    if (preg_match('#^/api/v1/webhooks/(.+)$#', $uri, $m) && $method === 'PUT') {
-        $_GET['id'] = $m[1];
-        (new WebhookController())->update();
-        exit;
-    }
-    if (preg_match('#^/api/v1/webhooks/(.+)$#', $uri, $m) && $method === 'DELETE') {
-        $_GET['id'] = $m[1];
-        (new WebhookController())->delete();
-        exit;
-    }
-    if (preg_match('#^/api/v1/webhooks/(.+)/test$#', $uri, $m) && $method === 'POST') {
-        $_GET['id'] = $m[1];
-        (new WebhookController())->test();
-        exit;
-    }
+                    if (data.matches && data.matches.length > 0) {
+                        html += '<div style="font-size: 0.9rem;">';
+                        data.matches.forEach((match, i) => {
+                            html += `
+                                <div style="padding: 0.5rem; background: rgba(251, 191, 36, 0.1); border-left: 3px solid var(--primary-color); margin-bottom: 0.5rem; border-radius: 3px;">
+                                    <strong>Match ${i + 1}:</strong> <code style="color: var(--accent-color);">${match.match}</code>
+                                    <span style="color: var(--text-secondary); margin-left: 0.5rem; font-size: 0.85rem;">@ position ${match.position}</span>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    } else {
+                        html += '<div style="color: var(--text-secondary);">No matches found</div>';
+                    }
 
-    // Billing endpoints (protected)
-    if ($uri === '/api/v1/billing/account' && $method === 'GET') {
-        (new BillingController())->getAccount();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/plans' && $method === 'GET') {
-        (new BillingController())->getPlans();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/upgrade' && $method === 'POST') {
-        (new BillingController())->upgradePlan();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/cancel' && $method === 'POST') {
-        (new BillingController())->cancelSubscription();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/usage' && $method === 'GET') {
-        (new BillingController())->getUsage();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/invoices' && $method === 'GET') {
-        (new BillingController())->getInvoices();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/payment' && $method === 'POST') {
-        (new BillingController())->processPayment();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/recommendation' && $method === 'GET') {
-        (new BillingController())->getPlanRecommendation();
-        exit;
-    }
-    if ($uri === '/api/v1/billing/webhook/stripe' && $method === 'POST') {
-        (new BillingController())->webhookStripe();
-        exit;
-    }
+                    outputDiv.innerHTML = html;
+                    resultDiv.style.display = 'block';
+                } else {
+                    outputDiv.innerHTML = '<div style="color: #ef4444;">❌ Error: ' + result.error.message + '</div>';
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                outputDiv.innerHTML = '<div style="color: #ef4444;">❌ Error: ' + error.message + '</div>';
+                resultDiv.style.display = 'block';
+            }
+        }
+    </script>
 
-    // Cryptocurrency validation endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/crypto/validate' && $method === 'POST') {
-        (new CryptoValidationController())->validate();
-        exit;
-    }
-    if ($uri === '/api/v1/crypto/validate/bitcoin' && $method === 'POST') {
-        (new CryptoValidationController())->validateBitcoin();
-        exit;
-    }
-    if ($uri === '/api/v1/crypto/validate/ethereum' && $method === 'POST') {
-        (new CryptoValidationController())->validateEthereum();
-        exit;
-    }
+    <section class="pricing">
+        <div class="container">
+            <h2>Simple, Transparent Pricing</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Free Trial</h3>
+                    <div class="price">$0</div>
+                    <div class="price-period">5 scans</div>
+                    <ul class="pricing-features">
+                        <li>5 free scans</li>
+                        <li>50MB file limit</li>
+                        <li>All verification tools</li>
+                        <li>30-day window</li>
+                        <li>No credit card required</li>
+                    </ul>
+                    <a href="/signup.php" class="btn btn-primary">Start Free</a>
+                </div>
 
-    // SSL/TLS tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/ssl/generate-csr' && $method === 'POST') {
-        (new SSLGeneratorController())->generate();
-        exit;
-    }
-    if ($uri === '/api/v1/ssl/validate-csr' && $method === 'POST') {
-        (new SSLGeneratorController())->validateCSR();
-        exit;
-    }
+                <div class="pricing-card featured">
+                    <h3>Monthly</h3>
+                    <div class="price">$9.99<span class="price-period">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>100 scans per month</li>
+                        <li>200MB file limit</li>
+                        <li>Priority processing</li>
+                        <li>Email support</li>
+                        <li>API access</li>
+                        <li>Scan history</li>
+                    </ul>
+                    <a href="/signup.php" class="btn btn-primary">Get Started</a>
+                </div>
 
-    // SSL Chain Resolver (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/ssl/resolve-chain' && $method === 'POST') {
-        (new SSLChainResolverController())->resolveChain();
-        exit;
-    }
-    if ($uri === '/api/v1/ssl/fetch-missing' && $method === 'POST') {
-        (new SSLChainResolverController())->fetchMissing();
-        exit;
-    }
-    if ($uri === '/api/v1/ssl/build-bundle' && $method === 'POST') {
-        (new SSLChainResolverController())->buildBundle();
-        exit;
-    }
-    if ($uri === '/api/v1/ssl/verify-key-pair' && $method === 'POST') {
-        (new SSLChainResolverController())->verifyKeyPair();
-        exit;
-    }
+                <div class="pricing-card">
+                    <h3>Annual</h3>
+                    <div class="price">$99<span class="price-period">/year</span></div>
+                    <ul class="pricing-features">
+                        <li>1,500 scans per year</li>
+                        <li>500MB file limit</li>
+                        <li>Priority processing</li>
+                        <li>Premium support</li>
+                        <li>API access</li>
+                        <li>Save 17%</li>
+                    </ul>
+                    <a href="/signup.php" class="btn btn-primary">Save $21/year</a>
+                </div>
 
-    // Email Verification Tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/email/check-disposable' && $method === 'POST') {
-        (new EmailVerificationController())->checkDisposable();
-        exit;
-    }
-    if ($uri === '/api/v1/email/analyze-spf' && $method === 'POST') {
-        (new EmailVerificationController())->analyzeSPF();
-        exit;
-    }
-    if ($uri === '/api/v1/email/analyze-dkim' && $method === 'POST') {
-        (new EmailVerificationController())->analyzeDKIM();
-        exit;
-    }
-    if ($uri === '/api/v1/email/verify-dkim-signature' && $method === 'POST') {
-        (new EmailVerificationController())->verifyDKIMSignature();
-        exit;
-    }
-    if ($uri === '/api/v1/email/analyze-dmarc' && $method === 'POST') {
-        (new EmailVerificationController())->analyzeDMARC();
-        exit;
-    }
-    if ($uri === '/api/v1/email/analyze-mx' && $method === 'POST') {
-        (new EmailVerificationController())->analyzeMX();
-        exit;
-    }
-    if ($uri === '/api/v1/email/analyze-headers' && $method === 'POST') {
-        (new EmailVerificationController())->analyzeHeaders();
-        exit;
-    }
-    if ($uri === '/api/v1/email/check-blacklists' && $method === 'POST') {
-        (new EmailVerificationController())->checkBlacklists();
-        exit;
-    }
-    if ($uri === '/api/v1/email/deliverability-score' && $method === 'POST') {
-        (new EmailVerificationController())->deliverabilityScore();
-        exit;
-    }
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <div class="price-period">Contact us</div>
+                    <ul class="pricing-features">
+                        <li>Unlimited scans</li>
+                        <li>Custom file limits</li>
+                        <li>Dedicated support</li>
+                        <li>SLA guarantee</li>
+                        <li>Custom integrations</li>
+                        <li>On-premise option</li>
+                    </ul>
+                    <a href="mailto:sales@veribits.com" class="btn btn-secondary">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // JWT tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/jwt/validate' && $method === 'POST') {
-        (new JWTController())->validate();
-        exit;
-    }
-    if ($uri === '/api/v1/jwt/decode' && $method === 'POST') {
-        (new JWTController())->decode();
-        exit;
-    }
-    if ($uri === '/api/v1/jwt/sign' && $method === 'POST') {
-        (new JWTController())->sign();
-        exit;
-    }
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VeriBits. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">
+                A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
+            </p>
+            <p style="margin-top: 1rem;">
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+            </p>
+        </div>
+    </footer>
 
-    // Developer tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/tools/regex-test' && $method === 'POST') {
-        (new DeveloperToolsController())->regexTest();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/validate-data' && $method === 'POST') {
-        (new DeveloperToolsController())->validateData();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/scan-secrets' && $method === 'POST') {
-        (new DeveloperToolsController())->scanSecrets();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/generate-hash' && $method === 'POST') {
-        (new DeveloperToolsController())->generateHash();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/url-encode' && $method === 'POST') {
-        (new DeveloperToolsController())->urlEncode();
-        exit;
-    }
-
-    // Code signing endpoints
-    if ($uri === '/api/v1/code-signing/sign' && $method === 'POST') {
-        (new CodeSigningController())->sign();
-        exit;
-    }
-    if ($uri === '/api/v1/code-signing/quota' && $method === 'GET') {
-        (new CodeSigningController())->getQuota();
-        exit;
-    }
-
-    // API Keys management (protected)
-    if ($uri === '/api/v1/api-keys' && $method === 'GET') {
-        (new ApiKeyController())->list();
-        exit;
-    }
-    if ($uri === '/api/v1/api-keys' && $method === 'POST') {
-        (new ApiKeyController())->create();
-        exit;
-    }
-    if (preg_match('#^/api/v1/api-keys/(.+)$#', $uri, $m) && $method === 'DELETE') {
-        (new ApiKeyController())->revoke($m[1]);
-        exit;
-    }
-
-    // User profile (protected)
-    if ($uri === '/api/v1/user/profile' && $method === 'GET') {
-        (new AuthController())->profile();
-        exit;
-    }
-
-    // Verifications history (protected)
-    if ($uri === '/api/v1/verifications' && $method === 'GET') {
-        (new VerificationsController())->list();
-        exit;
-    }
-
-    // Network tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/tools/dns-validate' && $method === 'POST') {
-        (new NetworkToolsController())->dnsValidate();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/ip-calculate' && $method === 'POST') {
-        (new NetworkToolsController())->ipCalculate();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/rbl-check' && $method === 'POST') {
-        (new NetworkToolsController())->rblCheck();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/smtp-relay-check' && $method === 'POST') {
-        (new NetworkToolsController())->smtpRelayCheck();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/whois' && $method === 'POST') {
-        (new NetworkToolsController())->whoisLookup();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/traceroute' && $method === 'POST') {
-        (new NetworkToolsController())->traceroute();
-        exit;
-    }
-    if ($uri === '/api/v1/zone-validate' && $method === 'POST') {
-        (new NetworkToolsController())->zoneValidate();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/cert-convert' && $method === 'POST') {
-        (new NetworkToolsController())->certConvert();
-        exit;
-    }
-
-    // Steganography detection (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/steganography-detect' && $method === 'POST') {
-        (new SteganographyController())->detect();
-        exit;
-    }
-
-    // BGP Intelligence tools (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/bgp/prefix' && $method === 'POST') {
-        (new BGPController())->prefixLookup();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/asn' && $method === 'POST') {
-        (new BGPController())->asLookup();
-        exit;
-    }
-
-    // Tool Search endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/tools/search' && $method === 'GET') {
-        (new ToolSearchController())->search();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/list' && $method === 'GET') {
-        (new ToolSearchController())->list();
-        exit;
-    }
-
-    // Cloud Storage Security Auditor endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/tools/cloud-storage/search' && $method === 'POST') {
-        (new CloudStorageController())->search();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/cloud-storage/list-buckets' && $method === 'POST') {
-        (new CloudStorageController())->listBuckets();
-        exit;
-    }
-    if ($uri === '/api/v1/tools/cloud-storage/analyze-security' && $method === 'POST') {
-        (new CloudStorageController())->analyzeSecurityPosture();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/asn/prefixes' && $method === 'POST') {
-        (new BGPController())->asPrefixes();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/asn/peers' && $method === 'POST') {
-        (new BGPController())->asPeers();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/asn/upstreams' && $method === 'POST') {
-        (new BGPController())->asUpstreams();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/asn/downstreams' && $method === 'POST') {
-        (new BGPController())->asDownstreams();
-        exit;
-    }
-    if ($uri === '/api/v1/bgp/search' && $method === 'POST') {
-        (new BGPController())->searchAS();
-        exit;
-    }
-
-    // Have I Been Pwned endpoints (supports anonymous with rate limiting)
-    if ($uri === '/api/v1/hibp/check-email' && $method === 'POST') {
-        (new HaveIBeenPwnedController())->checkEmail();
-        exit;
-    }
-    if ($uri === '/api/v1/hibp/check-password' && $method === 'POST') {
-        (new HaveIBeenPwnedController())->checkPassword();
-        exit;
-    }
-    if ($uri === '/api/v1/hibp/stats' && $method === 'GET') {
-        (new HaveIBeenPwnedController())->getStats();
-        exit;
-    }
-
-    // API documentation
-    if ($uri === '/api/v1/docs' && $method === 'GET') {
-        header('Content-Type: text/html');
-        include __DIR__ . '/../../docs/api-docs.html';
-        exit;
-    }
-
-    // 404 for unknown routes
-    Response::error('Endpoint not found', 404, ['path' => $uri, 'method' => $method]);
-
-} catch (\Throwable $e) {
-    Logger::critical('Unhandled exception in API', [
-        'error' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-        'trace' => $e->getTraceAsString(),
-        'uri' => $uri,
-        'method' => $method
-    ]);
-
-    if (Config::isDevelopment()) {
-        Response::error('Internal server error: ' . $e->getMessage(), 500, [
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ]);
-    } else {
-        Response::error('Internal server error', 500);
-    }
-}
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

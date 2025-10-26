@@ -11,12 +11,12 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/cli.html">CLI</a></li>
-                <li><a href="/pricing.html">Pricing</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/login.html">Login</a></li>
-                <li><a href="/signup.html" class="btn btn-primary">Sign Up</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/login.php">Login</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
             </ul>
         </div>
     </nav>
@@ -55,9 +55,9 @@
                 A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
             </p>
             <p style="margin-top: 1rem;">
-                <a href="/privacy.html" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
-                <a href="/terms.html" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
-                <a href="/support.html" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
             </p>
         </div>
     </footer>

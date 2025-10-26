@@ -11,12 +11,12 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/cli.html">CLI</a></li>
-                <li><a href="/pricing.html">Pricing</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/login.html">Login</a></li>
-                <li><a href="/signup.html" class="btn btn-primary">Sign Up</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/login.php">Login</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
             </ul>
         </div>
     </nav>
@@ -41,7 +41,7 @@
                     <div class="feature-icon">📚</div>
                     <h3 style="margin-bottom: 1rem;">Documentation</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">Browse our comprehensive guides and API documentation.</p>
-                    <a href="/docs/api-docs.html" class="btn btn-secondary">View Docs</a>
+                    <a href="/docs/api-docs.php" class="btn btn-secondary">View Docs</a>
                 </div>
 
                 <div class="feature-card" style="text-align: center;">
@@ -96,7 +96,7 @@
 
                 <div style="margin-bottom: 2rem;">
                     <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">How do I get started with VeriBits?</h3>
-                    <p style="color: var(--text-secondary);">Simply <a href="/signup.html" style="color: var(--accent-color);">sign up for a free account</a> to get 5 free scans. No credit card required. You can start using our tools immediately after registration.</p>
+                    <p style="color: var(--text-secondary);">Simply <a href="/signup.php" style="color: var(--accent-color);">sign up for a free account</a> to get 5 free scans. No credit card required. You can start using our tools immediately after registration.</p>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
@@ -111,7 +111,7 @@
 
                 <div style="margin-bottom: 2rem;">
                     <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">How do I access the API?</h3>
-                    <p style="color: var(--text-secondary);">API access is available with Monthly, Annual, and Enterprise plans. After subscribing, you can generate API keys from your <a href="/dashboard.html" style="color: var(--accent-color);">dashboard</a>. View our <a href="/docs/api-docs.html" style="color: var(--accent-color);">API documentation</a> for integration guides.</p>
+                    <p style="color: var(--text-secondary);">API access is available with Monthly, Annual, and Enterprise plans. After subscribing, you can generate API keys from your <a href="/dashboard.php" style="color: var(--accent-color);">dashboard</a>. View our <a href="/docs/api-docs.php" style="color: var(--accent-color);">API documentation</a> for integration guides.</p>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
@@ -126,7 +126,7 @@
 
                 <div style="margin-bottom: 2rem;">
                     <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">Is my data secure?</h3>
-                    <p style="color: var(--text-secondary);">Yes. All data is transmitted over TLS/SSL encryption. We use AWS infrastructure with enterprise-grade security. Files are processed in isolated environments and automatically deleted. See our <a href="/privacy.html" style="color: var(--accent-color);">Privacy Policy</a> for details.</p>
+                    <p style="color: var(--text-secondary);">Yes. All data is transmitted over TLS/SSL encryption. We use AWS infrastructure with enterprise-grade security. Files are processed in isolated environments and automatically deleted. See our <a href="/privacy.php" style="color: var(--accent-color);">Privacy Policy</a> for details.</p>
                 </div>
 
                 <div style="margin-bottom: 2rem;">
@@ -136,7 +136,7 @@
 
                 <div style="margin-bottom: 2rem;">
                     <h3 style="color: var(--text-primary); margin-bottom: 0.75rem;">How do I use the CLI?</h3>
-                    <p style="color: var(--text-secondary);">Visit our <a href="/cli.html" style="color: var(--accent-color);">CLI page</a> for installation instructions and usage examples. The CLI provides command-line access to all VeriBits verification tools.</p>
+                    <p style="color: var(--text-secondary);">Visit our <a href="/cli.php" style="color: var(--accent-color);">CLI page</a> for installation instructions and usage examples. The CLI provides command-line access to all VeriBits verification tools.</p>
                 </div>
 
                 <div>
@@ -173,9 +173,9 @@
                 A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
             </p>
             <p style="margin-top: 1rem;">
-                <a href="/privacy.html" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
-                <a href="/terms.html" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
-                <a href="/support.html" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
             </p>
         </div>
     </footer>

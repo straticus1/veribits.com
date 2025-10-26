@@ -11,12 +11,12 @@
         <div class="container">
             <a href="/" class="logo">VeriBits</a>
             <ul>
-                <li><a href="/tools.html">Tools</a></li>
-                <li><a href="/cli.html">CLI</a></li>
-                <li><a href="/pricing.html">Pricing</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/login.html">Login</a></li>
-                <li><a href="/signup.html" class="btn btn-primary">Sign Up</a></li>
+                <li><a href="/tools.php">Tools</a></li>
+                <li><a href="/cli.php">CLI</a></li>
+                <li><a href="/pricing.php">Pricing</a></li>
+                <li><a href="/about.php">About</a></li>
+                <li><a href="/login.php">Login</a></li>
+                <li><a href="/signup.php" class="btn btn-primary">Sign Up</a></li>
             </ul>
         </div>
     </nav>
@@ -41,7 +41,7 @@
                         <li>✓ 30-day window</li>
                         <li>✓ No credit card required</li>
                     </ul>
-                    <a href="/signup.html" class="btn btn-primary">Start Free</a>
+                    <a href="/signup.php" class="btn btn-primary">Start Free</a>
                 </div>
 
                 <div class="pricing-card featured">
@@ -59,7 +59,7 @@
                         <li>✓ API access</li>
                         <li>✓ Scan history</li>
                     </ul>
-                    <a href="/signup.html" class="btn btn-primary">Get Started</a>
+                    <a href="/signup.php" class="btn btn-primary">Get Started</a>
                 </div>
 
                 <div class="pricing-card">
@@ -77,7 +77,7 @@
                         <li>✓ API access</li>
                         <li>✓ Scan history</li>
                     </ul>
-                    <a href="/signup.html" class="btn btn-primary">Save $21/year</a>
+                    <a href="/signup.php" class="btn btn-primary">Save $21/year</a>
                 </div>
 
                 <div class="pricing-card">
@@ -228,7 +228,7 @@
                 <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;">
                     Start your free trial today. No credit card required.
                 </p>
-                <a href="/signup.html" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">Start Free Trial</a>
+                <a href="/signup.php" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">Start Free Trial</a>
             </div>
         </div>
     </section>
@@ -240,9 +240,9 @@
                 A service from <a href="https://www.afterdarksys.com/" target="_blank" rel="noopener">After Dark Systems, LLC</a>
             </p>
             <p style="margin-top: 1rem;">
-                <a href="/privacy.html" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
-                <a href="/terms.html" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
-                <a href="/support.html" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
+                <a href="/privacy.php" style="color: var(--text-secondary); margin: 0 1rem;">Privacy</a>
+                <a href="/terms.php" style="color: var(--text-secondary); margin: 0 1rem;">Terms</a>
+                <a href="/support.php" style="color: var(--text-secondary); margin: 0 1rem;">Support</a>
             </p>
         </div>
     </footer>
