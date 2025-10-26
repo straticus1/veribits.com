@@ -49,6 +49,9 @@ use VeriBits\Controllers\VerificationsController;
 use VeriBits\Controllers\NetworkToolsController;
 use VeriBits\Controllers\SteganographyController;
 use VeriBits\Controllers\BGPController;
+use VeriBits\Controllers\ToolSearchController;
+use VeriBits\Controllers\CloudStorageController;
+use VeriBits\Controllers\HaveIBeenPwnedController;
 
 // Initialize configuration
 Config::load();
@@ -397,6 +400,30 @@ try {
         (new BGPController())->asLookup();
         exit;
     }
+
+    // Tool Search endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/tools/search' && $method === 'GET') {
+        (new ToolSearchController())->search();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/list' && $method === 'GET') {
+        (new ToolSearchController())->list();
+        exit;
+    }
+
+    // Cloud Storage Security Auditor endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/tools/cloud-storage/search' && $method === 'POST') {
+        (new CloudStorageController())->search();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/cloud-storage/list-buckets' && $method === 'POST') {
+        (new CloudStorageController())->listBuckets();
+        exit;
+    }
+    if ($uri === '/api/v1/tools/cloud-storage/analyze-security' && $method === 'POST') {
+        (new CloudStorageController())->analyzeSecurityPosture();
+        exit;
+    }
     if ($uri === '/api/v1/bgp/asn/prefixes' && $method === 'POST') {
         (new BGPController())->asPrefixes();
         exit;
@@ -415,6 +442,20 @@ try {
     }
     if ($uri === '/api/v1/bgp/search' && $method === 'POST') {
         (new BGPController())->searchAS();
+        exit;
+    }
+
+    // Have I Been Pwned endpoints (supports anonymous with rate limiting)
+    if ($uri === '/api/v1/hibp/check-email' && $method === 'POST') {
+        (new HaveIBeenPwnedController())->checkEmail();
+        exit;
+    }
+    if ($uri === '/api/v1/hibp/check-password' && $method === 'POST') {
+        (new HaveIBeenPwnedController())->checkPassword();
+        exit;
+    }
+    if ($uri === '/api/v1/hibp/stats' && $method === 'GET') {
+        (new HaveIBeenPwnedController())->getStats();
         exit;
     }
 
