@@ -118,6 +118,10 @@ try {
         (new AdminController())->testRegister();
         exit;
     }
+    if ($uri === '/api/v1/admin/reset-password' && $method === 'POST') {
+        (new AdminController())->resetPassword();
+        exit;
+    }
     if ($uri === '/api/v1/auth/profile' && $method === 'GET') {
         (new AuthController())->profile();
         exit;

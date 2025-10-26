@@ -6,6 +6,51 @@ use VeriBits\Utils\Database;
 use VeriBits\Utils\Logger;
 
 class AdminController {
+    public function resetPassword(): void {
+        try {
+            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $email = $body['email'] ?? null;
+            $password = $body['password'] ?? null;
+
+            if (!$email || !$password) {
+                Response::error('Email and password required', 400);
+                return;
+            }
+
+            $hash = password_hash($password, PASSWORD_ARGON2ID);
+            $pdo = Database::getConnection();
+
+            // Check if user exists
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch();
+
+            if (!$user) {
+                // Create the user if they don't exist
+                $stmt = $pdo->prepare("INSERT INTO users (email, password_hash, status) VALUES (:email, :password_hash, 'active') RETURNING id");
+                $stmt->execute(['email' => $email, 'password_hash' => $hash]);
+                $userId = $stmt->fetchColumn();
+
+                // Create API key, billing account, and quota
+                $apiKey = 'vb_' . bin2hex(random_bytes(24));
+                Database::insert('api_keys', ['user_id' => $userId, 'key' => $apiKey, 'name' => 'Default API Key']);
+                Database::insert('billing_accounts', ['user_id' => $userId, 'plan' => 'free']);
+                Database::insert('quotas', ['user_id' => $userId, 'period' => 'monthly', 'allowance' => 1000, 'used' => 0]);
+
+                Response::success(['user_id' => $userId, 'api_key' => $apiKey, 'action' => 'created'], 'User created successfully');
+            } else {
+                // Update existing user's password
+                $stmt = $pdo->prepare("UPDATE users SET password_hash = :password_hash WHERE email = :email");
+                $stmt->execute(['password_hash' => $hash, 'email' => $email]);
+
+                Response::success(['user_id' => $user['id'], 'action' => 'updated'], 'Password updated successfully');
+            }
+
+        } catch (\Exception $e) {
+            Response::error('Password reset failed: ' . $e->getMessage(), 500);
+        }
+    }
+
     public function testRegister(): void {
         try {
             $body = json_decode(file_get_contents('php://input'), true) ?? [];
