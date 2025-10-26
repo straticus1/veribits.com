@@ -9,14 +9,14 @@ class AdminController {
     public function runMigrations(): void {
         try {
             $results = [];
-            $db = Database::getInstance();
+            $pdo = Database::getConnection();
 
             // Create all required tables
             $tables = $this->getTableDefinitions();
 
             foreach ($tables as $name => $sql) {
                 try {
-                    $db->exec($sql);
+                    $pdo->exec($sql);
                     $results[] = [
                         'table' => $name,
                         'status' => 'success'
