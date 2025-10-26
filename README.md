@@ -15,6 +15,8 @@ VeriBits is a comprehensive API platform providing verification, validation, and
 - **Code Signing** - Sign and verify code artifacts
 - **Steganography Detection** - Detect hidden data in images
 - **File Magic** - Identify file types and MIME types
+- **Security Breach Checker** 🆕 - Check emails/passwords against known data breaches (Have I Been Pwned)
+- **Cloud Storage Auditor** 🆕 - Analyze AWS S3, Azure, GCP storage security configurations
 
 ### Network Tools
 - **DNS Validation** - DNS record checks and zone file validation
@@ -22,11 +24,14 @@ VeriBits is a comprehensive API platform providing verification, validation, and
 - **RBL Check** - Check IP addresses against blacklists
 - **IP Calculator** - CIDR calculations and subnet tools
 - **Certificate Converter** - Convert between certificate formats
+- **Visual Traceroute** 🆕 - Interactive network path visualization with geographic mapping
+- **BGP Intelligence Portal** 🆕 - Advanced BGP route analysis and hijacking detection
 
 ### Developer Tools
 - **Regex Tester** - Test and validate regular expressions
 - **API Key Management** - Generate and manage API keys
 - **Verification History** - Track all verifications with pagination
+- **Search Tools** 🆕 - Full-text search across all tools and documentation
 
 ---
 
@@ -305,14 +310,14 @@ We welcome contributions! Please follow these steps:
 
 ## 🗺️ Roadmap
 
-### Version 1.3.0 (Planned)
+### Version 1.4.0 (Planned)
 - [ ] Additional cryptocurrency support (LTC, BCH, XRP)
 - [ ] WebSocket support for real-time updates
 - [ ] GraphQL API
 - [ ] Enhanced documentation with OpenAPI/Swagger
 - [ ] Mobile app (iOS/Android)
 
-### Version 1.4.0 (Planned)
+### Version 1.5.0 (Planned)
 - [ ] Machine learning-based file analysis
 - [ ] Advanced steganography detection
 - [ ] Blockchain integration
@@ -322,12 +327,12 @@ We welcome contributions! Please follow these steps:
 
 ## 📈 Status
 
-**Current Version:** 1.2.0  
+**Current Version:** 1.3.0  
 **Status:** Production Ready ✅  
-**Last Updated:** October 25, 2025  
+**Last Updated:** October 26, 2025  
 
 [![Health Check](https://img.shields.io/badge/status-healthy-success)](https://api.veribits.com/api/v1/health)
-[![Version](https://img.shields.io/badge/version-1.2.0-blue)](https://github.com/yourusername/veribits.com/releases)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue)](https://github.com/yourusername/veribits.com/releases)
 [![License](https://img.shields.io/badge/license-proprietary-red)](LICENSE)
 
 ---

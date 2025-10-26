@@ -1,7 +1,26 @@
-{
-  "ip_address6": "2600:4808:6373:f100:606f:7793:203d:81c0",
-  "ip_address4": "24.187.53.3",
-  "account_email": "straticus1@gmail.com",
-  "account_limit": "10000/requests/day",
-  "account_threshold": "180/requests/minute or 10,800/requests/hour"
-}
+[
+  {
+    "ip_address6": "2600:4808:6373:f100:606f:7793:203d:81c0",
+    "ip_address4": "24.187.53.3",
+    "account_email": "straticus1@gmail.com",
+    "account_limit": "10000/requests/day",
+    "account_threshold": "180/requests/minute or 10,800/requests/hour",
+    "description": "User primary IP"
+  },
+  {
+    "ip_address4": "54.204.86.80",
+    "description": "VeriBits ALB IP 1"
+  },
+  {
+    "ip_address4": "100.27.131.235",
+    "description": "VeriBits ALB IP 2"
+  },
+  {
+    "ip_address4": "10.0.51.153",
+    "description": "VeriBits ECS Task 1"
+  },
+  {
+    "ip_address4": "10.0.50.93",
+    "description": "VeriBits ECS Task 2"
+  }
+]

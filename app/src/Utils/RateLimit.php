@@ -6,7 +6,7 @@ class RateLimit {
     private const MAX_REQUESTS = 60; // 60 requests per minute default
 
     // Anonymous user limits (trial model)
-    private const ANONYMOUS_FREE_SCANS = 5; // 5 free scans then must register
+    private const ANONYMOUS_FREE_SCANS = 250; // 250 free scans then must register
     private const ANONYMOUS_MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB max file size
     private const ANONYMOUS_SCAN_WINDOW = 2592000; // 30 days (lifetime trial)
 
@@ -287,7 +287,7 @@ class RateLimit {
                         return [
                             'allowed' => false,
                             'reason' => 'trial_limit_exceeded',
-                            'message' => 'You have used all 5 free scans. Please create an account and add payment to continue.',
+                            'message' => 'You have used all 250 free scans. Please create an account and add payment to continue.',
                             'scans_used' => $scanCount,
                             'scans_limit' => self::ANONYMOUS_FREE_SCANS,
                             'remaining' => 0
@@ -344,7 +344,7 @@ class RateLimit {
                 return [
                     'allowed' => false,
                     'reason' => 'trial_limit_exceeded',
-                    'message' => 'You have used all 5 free scans. Please create an account and add payment to continue.',
+                    'message' => 'You have used all 250 free scans. Please create an account and add payment to continue.',
                     'scans_used' => $scanCount,
                     'scans_limit' => self::ANONYMOUS_FREE_SCANS,
                     'remaining' => 0
@@ -437,7 +437,7 @@ class RateLimit {
     public static function checkAnonymous(string $ipAddress): array {
         try {
             $key = "anon_basic:$ipAddress";
-            $allowed = self::check($key, 100, 3600); // 100 requests per hour for non-scan operations
+            $allowed = self::check($key, 25, 86400); // 25 requests per day for non-scan operations
 
             if (!$allowed) {
                 Logger::security('Anonymous rate limit exceeded', [
@@ -447,15 +447,15 @@ class RateLimit {
                     'allowed' => false,
                     'reason' => 'rate_limit_exceeded',
                     'message' => 'Too many requests. Please slow down or register for an account.',
-                    'hourly_limit' => 100,
-                    'hourly_remaining' => 0
+                    'daily_limit' => 25,
+                    'daily_remaining' => 0
                 ];
             }
 
             return [
                 'allowed' => true,
-                'hourly_limit' => 100,
-                'hourly_remaining' => self::getRemaining($key, 100, 3600)
+                'daily_limit' => 25,
+                'daily_remaining' => self::getRemaining($key, 25, 86400)
             ];
         } catch (\Exception $e) {
             Logger::error('Anonymous rate check failed', [
@@ -463,7 +463,7 @@ class RateLimit {
                 'error' => $e->getMessage()
             ]);
             // Fail open for basic rate limiting (non-critical)
-            return ['allowed' => true, 'hourly_remaining' => 100];
+            return ['allowed' => true, 'daily_remaining' => 25];
         }
     }
 
@@ -528,7 +528,7 @@ class RateLimit {
             'scans_used' => $scanStatus['scans_used'] ?? 0,
             'scans_remaining' => $scanStatus['scans_remaining'] ?? self::ANONYMOUS_FREE_SCANS,
             'trial_period_days' => self::ANONYMOUS_SCAN_WINDOW / 86400,
-            'message' => 'Get 5 free scans up to 50MB. After your trial, create an account and add payment to continue scanning.',
+            'message' => 'Get 250 free scans up to 50MB over 30 days. After your trial, create an account and add payment to continue scanning.',
             'upgrade_required' => ($scanStatus['scans_remaining'] ?? self::ANONYMOUS_FREE_SCANS) === 0
         ];
     }

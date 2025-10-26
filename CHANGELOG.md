@@ -5,6 +5,84 @@ All notable changes to VeriBits will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-10-26
+
+### Added
+- **Search Functionality**: New search page with tool and content search
+  - Added `frontend/app/search/` directory with search implementation
+  - Full-text search across tools and documentation
+  - Real-time search suggestions
+
+- **Cloud Storage Auditor Tool**: New tool for analyzing cloud storage configurations
+  - Added `frontend/app/tools/cloud-storage-auditor/` directory
+  - Security analysis for AWS S3, Azure Blob, Google Cloud Storage
+  - Permission and access control validation
+  - Compliance checking and best practices recommendations
+
+- **Cloud Storage Controller**: New backend controller for cloud storage operations
+  - Added `app/src/Controllers/CloudStorageController.php`
+  - API endpoints for cloud storage auditing
+  - Integration with major cloud providers
+
+- **Security Breach Checker**: Integrated Have I Been Pwned API
+  - Check email addresses and passwords against known data breaches
+  - Real-time breach notification
+  - Comprehensive breach details and recommendations
+
+- **Visual Traceroute Tool**: Network path visualization
+  - Interactive traceroute with geographic mapping
+  - Hop-by-hop latency analysis
+  - Network path troubleshooting
+
+- **BGP Intelligence Portal**: Advanced BGP route analysis
+  - AS path analysis and visualization
+  - Route origin validation
+  - BGP hijacking detection
+  - Peer relationship mapping
+
+- **Legal & Support Pages**:
+  - Comprehensive Terms of Service
+  - Privacy Policy with GDPR compliance
+  - Support and help documentation
+  - Legal compliance framework
+
+### Enhanced
+- **Navigation**: Improved navbar with search and tools dropdown
+  - Updated `frontend/app/components/Navbar.jsx`
+  - Better mobile responsiveness
+  - Quick access to popular tools
+  - Enhanced user experience
+
+- **Rate Limiting**: Refined anonymous user rate limits
+  - Updated `app/src/Utils/RateLimit.php`
+  - Better handling of edge cases
+  - Improved error messages
+  - More granular control
+
+- **Anonymous Limits**: Enhanced limits controller
+  - Updated `app/src/Controllers/AnonymousLimitsController.php`
+  - Better tracking and reporting
+  - Improved quota management
+
+- **Whitelist Configuration**: Expanded trusted IP and service whitelist
+  - Updated `config/whitelist.json`
+  - Additional trusted services
+  - Better security controls
+  - Improved access management
+
+- **Production Configuration**: Added production environment file
+  - Added `.env.production`
+  - Production-ready settings
+  - Optimized performance configurations
+
+### Changed
+- Improved error handling across rate limiting system
+- Enhanced whitelist validation logic
+- Better navigation structure for improved UX
+- Optimized search indexing and performance
+
+---
+
 ## [1.2.0] - 2025-10-25
 
 ### Added

@@ -31,12 +31,12 @@ class AnonymousLimitsController {
                 ],
                 'monthly' => [
                     'price' => '$9.99/month',
-                    'includes' => '100 scans/month',
+                    'includes' => '500 scans/month',
                     'overage' => '$0.08 per additional scan'
                 ],
                 'annual' => [
                     'price' => '$99/year',
-                    'includes' => '1,500 scans/year',
+                    'includes' => '5,000 scans/year',
                     'overage' => '$0.06 per additional scan',
                     'savings' => 'Save 17%'
                 ],
